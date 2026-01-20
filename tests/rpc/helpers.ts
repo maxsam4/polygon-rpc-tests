@@ -6,9 +6,9 @@ import type { Config, TestSettings } from '../../shared/types.js';
 const configPath = join(process.cwd(), 'config.json');
 const config: Config = JSON.parse(readFileSync(configPath, 'utf-8'));
 
-// Default to first endpoint in config, can be overridden via environment variable
+// Default to DRPC (reliable free tier), can be overridden via environment variable
 export function getRpcUrl(): string {
-  return process.env.RPC_URL || config.endpoints[0].url;
+  return process.env.RPC_URL || 'https://polygon.drpc.org';
 }
 
 export function getTestSettings(): TestSettings {
