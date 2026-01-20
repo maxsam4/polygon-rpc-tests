@@ -1,0 +1,148 @@
+{
+  "endpoints": [
+    { "url": "https://rpc.ankr.com/polygon", "name": "Ankr" },
+    { "url": "https://polygon-rpc.com", "name": "Polygon RPC" },
+    { "url": "https://rpc-mainnet.matic.quiknode.pro", "name": "QuickNode" },
+    { "url": "https://polygon-public.nodies.app", "name": "Nodies" },
+    { "url": "https://polygon-mainnet.public.blastapi.io", "name": "BlastAPI" },
+    { "url": "https://1rpc.io/matic", "name": "1RPC" },
+    { "url": "https://polygon-bor-rpc.publicnode.com", "name": "PublicNode" },
+    { "url": "wss://polygon-bor-rpc.publicnode.com", "name": "PublicNode WSS" },
+    { "url": "https://polygon-mainnet.g.alchemy.com/v2/demo", "name": "Alchemy" },
+    { "url": "https://polygon.api.onfinality.io/public", "name": "OnFinality" },
+    { "url": "https://polygon.drpc.org", "name": "dRPC" },
+    { "url": "https://polygon.gateway.tenderly.co", "name": "Tenderly" },
+    { "url": "https://gateway.tenderly.co/public/polygon", "name": "Tenderly Public" },
+    { "url": "https://api.zan.top/polygon-mainnet", "name": "ZAN" },
+    { "url": "https://polygon.meowrpc.com", "name": "MeowRPC" },
+    { "url": "https://public.stackup.sh/api/v1/node/polygon-mainnet", "name": "Stackup" },
+    { "url": "https://polygon.rpc.subquery.network/public", "name": "SubQuery" },
+    { "url": "https://endpoints.omniatech.io/v1/matic/mainnet/public", "name": "Omnia" },
+    { "url": "https://polygon.lava.build", "name": "Lava" },
+    { "url": "https://polygon.therpc.io", "name": "TheRPC" },
+    { "url": "https://poly.api.pocket.network", "name": "Pocket Network" }
+  ],
+  "testSettings": {
+    "timeoutMs": 10000,
+    "delayBetweenCallsMs": 100,
+    "archiveBlockNumber": 35000000,
+    "archiveTestAddress": "0x0000000000000000000000000000000000001010",
+    "concurrency": 5
+  },
+  "methods": {
+    "basic": [
+      "web3_clientVersion",
+      "web3_sha3",
+      "net_version",
+      "net_listening",
+      "net_peerCount",
+      "eth_protocolVersion",
+      "eth_syncing",
+      "eth_coinbase",
+      "eth_chainId",
+      "eth_mining",
+      "eth_hashrate",
+      "eth_gasPrice",
+      "eth_accounts",
+      "eth_blockNumber",
+      "eth_maxPriorityFeePerGas",
+      "eth_feeHistory",
+      "eth_blobBaseFee"
+    ],
+    "state": [
+      "eth_getBalance",
+      "eth_getStorageAt",
+      "eth_getTransactionCount",
+      "eth_getCode",
+      "eth_call",
+      "eth_estimateGas",
+      "eth_createAccessList"
+    ],
+    "block": [
+      "eth_getBlockByHash",
+      "eth_getBlockByNumber",
+      "eth_getBlockTransactionCountByHash",
+      "eth_getBlockTransactionCountByNumber",
+      "eth_getUncleCountByBlockHash",
+      "eth_getUncleCountByBlockNumber",
+      "eth_getUncleByBlockHashAndIndex",
+      "eth_getUncleByBlockNumberAndIndex",
+      "eth_getBlockReceipts"
+    ],
+    "transaction": [
+      "eth_getTransactionByHash",
+      "eth_getTransactionByBlockHashAndIndex",
+      "eth_getTransactionByBlockNumberAndIndex",
+      "eth_getTransactionReceipt"
+    ],
+    "filter": [
+      "eth_newFilter",
+      "eth_newBlockFilter",
+      "eth_newPendingTransactionFilter",
+      "eth_uninstallFilter",
+      "eth_getFilterChanges",
+      "eth_getFilterLogs",
+      "eth_getLogs"
+    ],
+    "archive": [
+      "eth_getBalance:archive",
+      "eth_getStorageAt:archive",
+      "eth_getTransactionCount:archive",
+      "eth_getCode:archive",
+      "eth_call:archive"
+    ],
+    "bor": [
+      "bor_getAuthor",
+      "bor_getCurrentValidators",
+      "bor_getCurrentProposer",
+      "bor_getRootHash",
+      "bor_getSignersAtHash",
+      "bor_getSnapshot",
+      "bor_getSnapshotAtHash",
+      "bor_getSnapshotProposer",
+      "bor_getSnapshotProposerSequence"
+    ],
+    "erigon": [
+      "erigon_forks",
+      "erigon_getHeaderByNumber",
+      "erigon_getHeaderByHash",
+      "erigon_getBlockByTimestamp",
+      "erigon_getLogsByHash",
+      "erigon_blockNumber",
+      "erigon_cacheCheck"
+    ],
+    "debug": [
+      "debug_traceTransaction",
+      "debug_traceCall",
+      "debug_traceBlockByNumber",
+      "debug_traceBlockByHash",
+      "debug_storageRangeAt",
+      "debug_getBadBlocks",
+      "debug_accountRange",
+      "debug_getModifiedAccountsByNumber",
+      "debug_getModifiedAccountsByHash"
+    ],
+    "trace": [
+      "trace_call",
+      "trace_callMany",
+      "trace_rawTransaction",
+      "trace_replayBlockTransactions",
+      "trace_replayTransaction",
+      "trace_block",
+      "trace_filter",
+      "trace_get",
+      "trace_transaction"
+    ],
+    "txpool": [
+      "txpool_content",
+      "txpool_inspect",
+      "txpool_status"
+    ],
+    "websocket": [
+      "eth_subscribe:newHeads",
+      "eth_subscribe:logs",
+      "eth_subscribe:newPendingTransactions",
+      "eth_subscribe:syncing"
+    ]
+  }
+}
