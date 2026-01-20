@@ -1,14 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { push } from 'svelte-spa-router';
-  import 'ag-grid-community/styles/ag-grid.css';
-  import 'ag-grid-community/styles/ag-theme-alpine.css';
-  import { results, loading, error, endpointSummaries, categories, type EndpointSummary } from '../stores/results';
+  import { results, loading, error, endpointSummaries, categories } from '../stores/results';
   import { fetchResults } from '../lib/api';
   import StatusBadge from '../components/StatusBadge.svelte';
 
   let filter = '';
-  let gridData: EndpointSummary[] = [];
 
   $: filteredData = $endpointSummaries.filter(ep =>
     ep.name.toLowerCase().includes(filter.toLowerCase()) ||
