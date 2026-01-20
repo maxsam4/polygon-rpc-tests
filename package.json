@@ -14,7 +14,20 @@
     "build": "npm run build:server && npm run build:web",
     "build:server": "tsc",
     "build:web": "vite build --config web/vite.config.ts",
-    "start": "node dist/server/index.js"
+    "start": "node dist/server/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:basic": "vitest run tests/rpc/basic.test.ts",
+    "test:state": "vitest run tests/rpc/state.test.ts",
+    "test:block": "vitest run tests/rpc/block.test.ts",
+    "test:transaction": "vitest run tests/rpc/transaction.test.ts",
+    "test:filter": "vitest run tests/rpc/filter.test.ts",
+    "test:archive": "vitest run tests/rpc/archive.test.ts",
+    "test:bor": "vitest run tests/rpc/bor.test.ts",
+    "test:erigon": "vitest run tests/rpc/erigon.test.ts",
+    "test:debug": "vitest run tests/rpc/debug.test.ts",
+    "test:trace": "vitest run tests/rpc/trace.test.ts",
+    "test:txpool": "vitest run tests/rpc/txpool.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -38,6 +51,7 @@
     "svelte-spa-router": "^4.0.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^4.0.17"
   }
 }
