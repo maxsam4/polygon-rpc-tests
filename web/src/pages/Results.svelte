@@ -12,10 +12,31 @@
     return endpoint.categorySummaries[category];
   }
 
-  $: filteredData = $endpointSummaries.filter(ep =>
-    ep.name.toLowerCase().includes(filter.toLowerCase()) ||
-    (!ep.sensitive && ep.url.toLowerCase().includes(filter.toLowerCase()))
-  );
+  function getTotalSummary(endpoint: EndpointSummary): { passed: number; total: number; status: 'pass' | 'partial' | 'fail' | 'none'; text: string } {
+    let passed = 0;
+    let total = 0;
+    for (const category of categories) {
+      const summary = endpoint.categorySummaries[category];
+      if (summary) {
+        passed += summary.passed;
+        total += summary.total;
+      }
+    }
+    let status: 'pass' | 'partial' | 'fail' | 'none' = 'none';
+    if (total > 0) {
+      if (passed === total) status = 'pass';
+      else if (passed > 0) status = 'partial';
+      else status = 'fail';
+    }
+    return { passed, total, status, text: total > 0 ? `${passed}/${total}` : '' };
+  }
+
+  $: filteredData = $endpointSummaries
+    .filter(ep =>
+      ep.name.toLowerCase().includes(filter.toLowerCase()) ||
+      (!ep.sensitive && ep.url.toLowerCase().includes(filter.toLowerCase()))
+    )
+    .sort((a, b) => getTotalSummary(b).passed - getTotalSummary(a).passed);
 
   onMount(async () => {
     $loading = true;
@@ -61,6 +82,7 @@
         <thead>
           <tr>
             <th class="endpoint-col">Endpoint</th>
+            <th class="total-col">Total</th>
             {#each categories as category}
               <th class="category-col">{category}</th>
             {/each}
@@ -74,6 +96,12 @@
                   <span class="name">{endpoint.name}</span>
                   <span class="node-type">{endpoint.nodeType}</span>
                 </div>
+              </td>
+              <td class="total-col">
+                <StatusBadge
+                  status={getTotalSummary(endpoint).status}
+                  text={getTotalSummary(endpoint).text}
+                />
               </td>
               {#each categories as category}
                 <td class="category-col">
@@ -156,6 +184,12 @@
   .category-col {
     min-width: 80px;
     text-align: center;
+  }
+
+  .total-col {
+    min-width: 90px;
+    text-align: center;
+    font-weight: 600;
   }
 
   .clickable {
