@@ -9,6 +9,9 @@
   let progressLog: ProgressEvent[] = [];
   let error: string | null = null;
   let unsubscribe: (() => void) | null = null;
+  let globalCompleted = 0;
+  let globalTotal = 0;
+  $: globalPercentage = globalTotal > 0 ? Math.round((globalCompleted / globalTotal) * 100) : 0;
 
   onMount(async () => {
     // Check initial status
@@ -26,13 +29,19 @@
         if (event.type === 'complete') {
           isRunning = false;
           progress = null;
+          globalCompleted = 0;
+          globalTotal = 0;
         } else if (event.type === 'error') {
           isRunning = false;
           error = event.error || 'Test run failed';
         } else if (event.type === 'progress') {
           progress = event;
+          if (event.globalCompleted !== undefined) globalCompleted = event.globalCompleted;
+          if (event.globalTotal !== undefined) globalTotal = event.globalTotal;
         } else if (event.type === 'result') {
           progressLog = [...progressLog.slice(-99), event];
+          if (event.globalCompleted !== undefined) globalCompleted = event.globalCompleted;
+          if (event.globalTotal !== undefined) globalTotal = event.globalTotal;
         }
       },
       (err) => {
@@ -53,6 +62,8 @@
 
     error = null;
     progressLog = [];
+    globalCompleted = 0;
+    globalTotal = 0;
 
     try {
       await startTestRun(password);
@@ -92,9 +103,21 @@
     {/if}
   </div>
 
+  {#if isRunning && globalTotal > 0}
+    <div class="section">
+      <h3>Overall Progress</h3>
+      <div class="progress-bar-container">
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: {globalPercentage}%"></div>
+        </div>
+        <div class="progress-stats">{globalCompleted} / {globalTotal} ({globalPercentage}%)</div>
+      </div>
+    </div>
+  {/if}
+
   {#if isRunning && progress}
     <div class="section">
-      <h3>Progress</h3>
+      <h3>Current Progress</h3>
       <div class="progress-info">
         <span>Endpoint: <strong>{progress.endpoint}</strong></span>
         <span>Category: <strong>{progress.category}</strong></span>
@@ -162,6 +185,30 @@
   .progress-info {
     display: flex;
     gap: 2rem;
+  }
+
+  .progress-bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .progress-bar {
+    height: 20px;
+    background-color: var(--bg-primary);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background-color: var(--success);
+    transition: width 0.3s ease;
+  }
+
+  .progress-stats {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
   }
 
   .log {

@@ -1,59 +1,66 @@
-import { describe, it, expect, beforeAll } from 'vitest';
-import { getRpcUrl, callRpc, assertMethodWorks, getTestSettings } from './helpers.js';
+import { describe, it, beforeAll } from 'vitest';
+import { getRpcUrl, callRpc, assertMethodWorks, getMethodParams, getTestSettings } from './helpers.js';
 
 describe('Trace RPC Methods', () => {
   let rpcUrl: string;
-  let testAddress: string;
-  let sampleTxHash: string | null = null;
+  const settings = getTestSettings();
 
-  beforeAll(async () => {
+  beforeAll(() => {
     rpcUrl = getRpcUrl();
-    testAddress = getTestSettings().archiveTestAddress;
     console.log(`Testing against: ${rpcUrl}`);
-
-    // Get a real transaction hash
-    const latestBlock = await callRpc(rpcUrl, 'eth_getBlockByNumber', ['latest', true]);
-    const txs = (latestBlock.result as any)?.transactions;
-    if (txs && txs.length > 0) {
-      sampleTxHash = txs[0].hash || txs[0];
-    }
   });
 
   it('trace_call - traces a call', async () => {
-    const response = await callRpc(rpcUrl, 'trace_call', [
-      { to: testAddress },
-      ['trace'],
-      'latest'
-    ], 30000);
+    const params = getMethodParams('trace_call', settings);
+    const response = await callRpc(rpcUrl, 'trace_call', params, 30000);
     assertMethodWorks(response, 'trace_call');
   });
 
+  it('trace_callMany - traces multiple calls', async () => {
+    const params = getMethodParams('trace_callMany', settings);
+    const response = await callRpc(rpcUrl, 'trace_callMany', params, 30000);
+    assertMethodWorks(response, 'trace_callMany');
+  });
+
+  it('trace_rawTransaction - traces raw transaction', async () => {
+    const params = getMethodParams('trace_rawTransaction', settings);
+    const response = await callRpc(rpcUrl, 'trace_rawTransaction', params, 30000);
+    assertMethodWorks(response, 'trace_rawTransaction');
+  });
+
+  it('trace_replayBlockTransactions - replays block transactions', async () => {
+    const params = getMethodParams('trace_replayBlockTransactions', settings);
+    const response = await callRpc(rpcUrl, 'trace_replayBlockTransactions', params, 30000);
+    assertMethodWorks(response, 'trace_replayBlockTransactions');
+  });
+
+  it('trace_replayTransaction - replays transaction', async () => {
+    const params = getMethodParams('trace_replayTransaction', settings);
+    const response = await callRpc(rpcUrl, 'trace_replayTransaction', params, 30000);
+    assertMethodWorks(response, 'trace_replayTransaction');
+  });
+
   it('trace_block - traces a block', async () => {
-    const response = await callRpc(rpcUrl, 'trace_block', ['latest'], 30000);
+    const params = getMethodParams('trace_block', settings);
+    const response = await callRpc(rpcUrl, 'trace_block', params, 30000);
     assertMethodWorks(response, 'trace_block');
   });
 
-  it('trace_transaction - traces transaction', async () => {
-    if (!sampleTxHash) {
-      console.log('Skipping: no sample transaction available');
-      return;
-    }
-    const response = await callRpc(rpcUrl, 'trace_transaction', [sampleTxHash], 30000);
-    assertMethodWorks(response, 'trace_transaction');
-  });
-
   it('trace_filter - filters traces', async () => {
-    const response = await callRpc(rpcUrl, 'trace_filter', [
-      { fromBlock: 'latest', toBlock: 'latest', count: 1 }
-    ], 30000);
+    const params = getMethodParams('trace_filter', settings);
+    const response = await callRpc(rpcUrl, 'trace_filter', params, 30000);
     assertMethodWorks(response, 'trace_filter');
   });
 
-  it('trace_replayBlockTransactions - replays block', async () => {
-    const response = await callRpc(rpcUrl, 'trace_replayBlockTransactions', [
-      'latest',
-      ['trace']
-    ], 30000);
-    assertMethodWorks(response, 'trace_replayBlockTransactions');
+  it('trace_get - gets trace by index', async () => {
+    const params = getMethodParams('trace_get', settings);
+    const response = await callRpc(rpcUrl, 'trace_get', params, 30000);
+    assertMethodWorks(response, 'trace_get');
+  });
+
+  it('trace_transaction - traces transaction', async () => {
+    const params = getMethodParams('trace_transaction', settings);
+    const response = await callRpc(rpcUrl, 'trace_transaction', params, 30000);
+    assertMethodWorks(response, 'trace_transaction');
   });
 });

@@ -24,10 +24,10 @@
     "test:filter": "vitest run tests/rpc/filter.test.ts",
     "test:archive": "vitest run tests/rpc/archive.test.ts",
     "test:bor": "vitest run tests/rpc/bor.test.ts",
-    "test:erigon": "vitest run tests/rpc/erigon.test.ts",
     "test:debug": "vitest run tests/rpc/debug.test.ts",
     "test:trace": "vitest run tests/rpc/trace.test.ts",
-    "test:txpool": "vitest run tests/rpc/txpool.test.ts"
+    "test:txpool": "vitest run tests/rpc/txpool.test.ts",
+    "test:batch": "vitest run tests/rpc/batch.test.ts"
   },
   "keywords": [],
   "author": "",

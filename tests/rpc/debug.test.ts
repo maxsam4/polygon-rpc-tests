@@ -1,48 +1,66 @@
-import { describe, it, expect, beforeAll } from 'vitest';
-import { getRpcUrl, callRpc, assertMethodWorks, getTestSettings } from './helpers.js';
+import { describe, it, beforeAll } from 'vitest';
+import { getRpcUrl, callRpc, assertMethodWorks, getMethodParams, getTestSettings } from './helpers.js';
 
 describe('Debug RPC Methods', () => {
   let rpcUrl: string;
-  let testAddress: string;
-  let sampleTxHash: string | null = null;
+  const settings = getTestSettings();
 
-  beforeAll(async () => {
+  beforeAll(() => {
     rpcUrl = getRpcUrl();
-    testAddress = getTestSettings().archiveTestAddress;
     console.log(`Testing against: ${rpcUrl}`);
-
-    // Get a real transaction hash
-    const latestBlock = await callRpc(rpcUrl, 'eth_getBlockByNumber', ['latest', true]);
-    const txs = (latestBlock.result as any)?.transactions;
-    if (txs && txs.length > 0) {
-      sampleTxHash = txs[0].hash || txs[0];
-    }
   });
 
   it('debug_traceCall - traces a call', async () => {
-    const response = await callRpc(rpcUrl, 'debug_traceCall', [
-      { to: testAddress },
-      'latest'
-    ], 30000);
+    const params = getMethodParams('debug_traceCall', settings);
+    const response = await callRpc(rpcUrl, 'debug_traceCall', params, 30000);
     assertMethodWorks(response, 'debug_traceCall');
   });
 
-  it('debug_traceBlockByNumber - traces block', async () => {
-    const response = await callRpc(rpcUrl, 'debug_traceBlockByNumber', ['latest'], 30000);
+  it('debug_traceBlockByNumber - traces block by number', async () => {
+    const params = getMethodParams('debug_traceBlockByNumber', settings);
+    const response = await callRpc(rpcUrl, 'debug_traceBlockByNumber', params, 30000);
     assertMethodWorks(response, 'debug_traceBlockByNumber');
   });
 
+  it('debug_traceBlockByHash - traces block by hash', async () => {
+    const params = getMethodParams('debug_traceBlockByHash', settings);
+    const response = await callRpc(rpcUrl, 'debug_traceBlockByHash', params, 30000);
+    assertMethodWorks(response, 'debug_traceBlockByHash');
+  });
+
   it('debug_traceTransaction - traces transaction', async () => {
-    if (!sampleTxHash) {
-      console.log('Skipping: no sample transaction available');
-      return;
-    }
-    const response = await callRpc(rpcUrl, 'debug_traceTransaction', [sampleTxHash], 30000);
+    const params = getMethodParams('debug_traceTransaction', settings);
+    const response = await callRpc(rpcUrl, 'debug_traceTransaction', params, 30000);
     assertMethodWorks(response, 'debug_traceTransaction');
   });
 
+  it('debug_storageRangeAt - returns storage range', async () => {
+    const params = getMethodParams('debug_storageRangeAt', settings);
+    const response = await callRpc(rpcUrl, 'debug_storageRangeAt', params, 30000);
+    assertMethodWorks(response, 'debug_storageRangeAt');
+  });
+
   it('debug_getBadBlocks - returns bad blocks', async () => {
-    const response = await callRpc(rpcUrl, 'debug_getBadBlocks');
+    const params = getMethodParams('debug_getBadBlocks', settings);
+    const response = await callRpc(rpcUrl, 'debug_getBadBlocks', params);
     assertMethodWorks(response, 'debug_getBadBlocks');
+  });
+
+  it('debug_accountRange - returns account range', async () => {
+    const params = getMethodParams('debug_accountRange', settings);
+    const response = await callRpc(rpcUrl, 'debug_accountRange', params, 30000);
+    assertMethodWorks(response, 'debug_accountRange');
+  });
+
+  it('debug_getModifiedAccountsByNumber - returns modified accounts', async () => {
+    const params = getMethodParams('debug_getModifiedAccountsByNumber', settings);
+    const response = await callRpc(rpcUrl, 'debug_getModifiedAccountsByNumber', params, 30000);
+    assertMethodWorks(response, 'debug_getModifiedAccountsByNumber');
+  });
+
+  it('debug_getModifiedAccountsByHash - returns modified accounts by hash', async () => {
+    const params = getMethodParams('debug_getModifiedAccountsByHash', settings);
+    const response = await callRpc(rpcUrl, 'debug_getModifiedAccountsByHash', params, 30000);
+    assertMethodWorks(response, 'debug_getModifiedAccountsByHash');
   });
 });

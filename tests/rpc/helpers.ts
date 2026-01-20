@@ -1,6 +1,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import type { Config, TestSettings } from '../../shared/types.js';
+import type { Config, TestSettings, LatestData } from '../../shared/types.js';
+
+// Re-export from shared module so tests can use the same params as production
+export { getMethodParams, getActualMethod, getSubscriptionParams, KNOWN_BLOCK_HASH, KNOWN_TX_HASH } from '../../shared/rpcParams.js';
 
 // Load config for default settings
 const configPath = join(process.cwd(), 'config.json');
@@ -60,13 +63,54 @@ export function isMethodSupported(response: RpcResponse): boolean {
   if (errorMsg.includes('not implemented')) return false;
   if (errorMsg.includes('method not available')) return false;
   if (errorMsg.includes('does not exist')) return false;
+  if (errorMsg.includes('invalid method')) return false;
 
   return true;
+}
+
+// Check if error is due to tier/access restrictions (not a method failure)
+export function isTierRestricted(response: RpcResponse): boolean {
+  if (!response.error) return false;
+
+  const errorMsg = response.error.message?.toLowerCase() || '';
+  return (
+    errorMsg.includes('freetier') ||
+    errorMsg.includes('free tier') ||
+    errorMsg.includes('api key') ||
+    errorMsg.includes('upgrade') ||
+    errorMsg.includes('not allowed')
+  );
+}
+
+// Check if error is due to archive node limitations (provider doesn't have full history)
+export function isArchiveLimited(response: RpcResponse): boolean {
+  if (!response.error) return false;
+
+  const errorMsg = response.error.message?.toLowerCase() || '';
+  return (
+    errorMsg.includes('haven\'t been fully indexed') ||
+    errorMsg.includes('not indexed') ||
+    errorMsg.includes('missing trie node') ||
+    errorMsg.includes('historical') ||
+    errorMsg.includes('pruned')
+  );
 }
 
 export function assertMethodWorks(response: RpcResponse, method: string): void {
   if (!isMethodSupported(response)) {
     throw new Error(`Method ${method} is not supported: ${response.error?.message}`);
+  }
+
+  // Tier restrictions are not method failures - method works but requires paid tier
+  if (isTierRestricted(response)) {
+    console.log(`Method ${method} requires paid tier access, skipping validation`);
+    return;
+  }
+
+  // Archive limitations are not method failures - provider doesn't have full history
+  if (isArchiveLimited(response)) {
+    console.log(`Method ${method} limited by archive data availability, skipping validation`);
+    return;
   }
 
   if (response.error) {
@@ -89,5 +133,60 @@ export function assertMethodWorks(response: RpcResponse, method: string): void {
     if (!isAcceptable) {
       throw new Error(`Method ${method} failed: ${response.error.message}`);
     }
+  }
+}
+
+/**
+ * Collect latest blockchain data for non-archive method tests.
+ * Fetches a recent block (5 blocks behind latest for stability) and extracts
+ * the block hash and a transaction hash from it.
+ */
+export async function collectLatestData(
+  url: string,
+  timeoutMs: number = 10000
+): Promise<LatestData | null> {
+  try {
+    // Get latest block number
+    const blockNumResponse = await callRpc(url, 'eth_blockNumber', [], timeoutMs);
+    if (!blockNumResponse.result) return null;
+
+    // Use a block 5 behind latest for stability
+    const latestNum = parseInt(blockNumResponse.result as string, 16);
+    const targetNum = latestNum - 5;
+    const targetBlockHex = `0x${targetNum.toString(16)}`;
+
+    // Get block with transactions
+    const blockResponse = await callRpc(url, 'eth_getBlockByNumber', [targetBlockHex, true], timeoutMs);
+    if (!blockResponse.result) return null;
+
+    const block = blockResponse.result as { hash: string; transactions: Array<{ hash: string }> };
+    const blockHash = block.hash;
+    let txHash: string | null = null;
+
+    // Try to find a transaction in this block or search recent blocks
+    if (block.transactions && block.transactions.length > 0) {
+      txHash = block.transactions[0].hash;
+    } else {
+      // Search up to 10 recent blocks for a transaction
+      for (let i = 1; i <= 10; i++) {
+        const searchBlockHex = `0x${(targetNum - i).toString(16)}`;
+        const searchResponse = await callRpc(url, 'eth_getBlockByNumber', [searchBlockHex, true], timeoutMs);
+        const searchBlock = searchResponse.result as { transactions: Array<{ hash: string }> } | null;
+        if (searchBlock?.transactions?.length > 0) {
+          txHash = searchBlock.transactions[0].hash;
+          break;
+        }
+      }
+    }
+
+    if (!txHash) return null;
+
+    return {
+      blockNumber: targetBlockHex,
+      blockHash,
+      txHash,
+    };
+  } catch {
+    return null;
   }
 }

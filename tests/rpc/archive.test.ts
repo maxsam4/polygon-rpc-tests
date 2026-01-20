@@ -1,46 +1,47 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { getRpcUrl, callRpc, assertMethodWorks, getTestSettings } from './helpers.js';
+import { getRpcUrl, callRpc, assertMethodWorks, isArchiveLimited, getMethodParams, getTestSettings } from './helpers.js';
 
 describe('Archive RPC Methods', () => {
   let rpcUrl: string;
-  let testAddress: string;
-  let archiveBlock: string;
+  const settings = getTestSettings();
 
   beforeAll(() => {
     rpcUrl = getRpcUrl();
-    const settings = getTestSettings();
-    testAddress = settings.archiveTestAddress;
-    archiveBlock = `0x${settings.archiveBlockNumber.toString(16)}`;
+    const archiveBlock = `0x${settings.archiveBlockNumber.toString(16)}`;
     console.log(`Testing against: ${rpcUrl}`);
     console.log(`Archive block: ${archiveBlock} (${settings.archiveBlockNumber})`);
   });
 
   it('eth_getBalance:archive - returns historical balance', async () => {
-    const response = await callRpc(rpcUrl, 'eth_getBalance', [testAddress, archiveBlock]);
+    const params = getMethodParams('eth_getBalance:archive', settings);
+    const response = await callRpc(rpcUrl, 'eth_getBalance', params);
     assertMethodWorks(response, 'eth_getBalance:archive');
-    expect(response.result).toBeDefined();
+    if (!isArchiveLimited(response)) {
+      expect(response.result).toBeDefined();
+    }
   });
 
   it('eth_getStorageAt:archive - returns historical storage', async () => {
-    const response = await callRpc(rpcUrl, 'eth_getStorageAt', [testAddress, '0x0', archiveBlock]);
+    const params = getMethodParams('eth_getStorageAt:archive', settings);
+    const response = await callRpc(rpcUrl, 'eth_getStorageAt', params);
     assertMethodWorks(response, 'eth_getStorageAt:archive');
   });
 
   it('eth_getTransactionCount:archive - returns historical nonce', async () => {
-    const response = await callRpc(rpcUrl, 'eth_getTransactionCount', [testAddress, archiveBlock]);
+    const params = getMethodParams('eth_getTransactionCount:archive', settings);
+    const response = await callRpc(rpcUrl, 'eth_getTransactionCount', params);
     assertMethodWorks(response, 'eth_getTransactionCount:archive');
   });
 
   it('eth_getCode:archive - returns historical code', async () => {
-    const response = await callRpc(rpcUrl, 'eth_getCode', [testAddress, archiveBlock]);
+    const params = getMethodParams('eth_getCode:archive', settings);
+    const response = await callRpc(rpcUrl, 'eth_getCode', params);
     assertMethodWorks(response, 'eth_getCode:archive');
   });
 
   it('eth_call:archive - executes historical call', async () => {
-    const response = await callRpc(rpcUrl, 'eth_call', [
-      { to: testAddress, data: '0x' },
-      archiveBlock
-    ]);
+    const params = getMethodParams('eth_call:archive', settings);
+    const response = await callRpc(rpcUrl, 'eth_call', params);
     assertMethodWorks(response, 'eth_call:archive');
   });
 });

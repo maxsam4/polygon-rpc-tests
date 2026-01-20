@@ -16,7 +16,7 @@ A comprehensive testing tool for Polygon RPC endpoints. Tests multiple public RP
 
 ### Prerequisites
 
-- Node.js 20.19+ or 22.12+
+- Node.js 20.19+
 - npm
 
 ### Installation
@@ -200,6 +200,3 @@ The tool comes with 21 pre-configured public Polygon RPC endpoints:
 | Unsupported | 🚫 | Method not implemented |
 | Skipped | ⏭️ | Depends on failed prerequisite |
 
-## License
-
-ISC

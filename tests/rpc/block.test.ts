@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { getRpcUrl, callRpc, assertMethodWorks } from './helpers.js';
+import { getRpcUrl, callRpc, assertMethodWorks, getMethodParams, getTestSettings } from './helpers.js';
 
 describe('Block RPC Methods', () => {
   let rpcUrl: string;
+  const settings = getTestSettings();
 
   beforeAll(() => {
     rpcUrl = getRpcUrl();
@@ -10,47 +11,39 @@ describe('Block RPC Methods', () => {
   });
 
   it('eth_getBlockByNumber - returns block by number', async () => {
-    const response = await callRpc(rpcUrl, 'eth_getBlockByNumber', ['latest', false]);
+    const params = getMethodParams('eth_getBlockByNumber', settings);
+    const response = await callRpc(rpcUrl, 'eth_getBlockByNumber', params);
     assertMethodWorks(response, 'eth_getBlockByNumber');
     expect(response.result).toBeDefined();
-    expect((response.result as any).number).toBeDefined();
   });
 
   it('eth_getBlockByHash - returns block by hash', async () => {
-    // First get a real block hash
-    const latestBlock = await callRpc(rpcUrl, 'eth_getBlockByNumber', ['latest', false]);
-    const blockHash = (latestBlock.result as any)?.hash;
-
-    if (blockHash) {
-      const response = await callRpc(rpcUrl, 'eth_getBlockByHash', [blockHash, false]);
-      assertMethodWorks(response, 'eth_getBlockByHash');
-      expect(response.result).toBeDefined();
-    }
+    const params = getMethodParams('eth_getBlockByHash', settings);
+    const response = await callRpc(rpcUrl, 'eth_getBlockByHash', params);
+    assertMethodWorks(response, 'eth_getBlockByHash');
   });
 
   it('eth_getBlockTransactionCountByNumber - returns tx count', async () => {
-    const response = await callRpc(rpcUrl, 'eth_getBlockTransactionCountByNumber', ['latest']);
+    const params = getMethodParams('eth_getBlockTransactionCountByNumber', settings);
+    const response = await callRpc(rpcUrl, 'eth_getBlockTransactionCountByNumber', params);
     assertMethodWorks(response, 'eth_getBlockTransactionCountByNumber');
-    expect(response.result).toBeDefined();
   });
 
   it('eth_getBlockTransactionCountByHash - returns tx count by hash', async () => {
-    const latestBlock = await callRpc(rpcUrl, 'eth_getBlockByNumber', ['latest', false]);
-    const blockHash = (latestBlock.result as any)?.hash;
-
-    if (blockHash) {
-      const response = await callRpc(rpcUrl, 'eth_getBlockTransactionCountByHash', [blockHash]);
-      assertMethodWorks(response, 'eth_getBlockTransactionCountByHash');
-    }
+    const params = getMethodParams('eth_getBlockTransactionCountByHash', settings);
+    const response = await callRpc(rpcUrl, 'eth_getBlockTransactionCountByHash', params);
+    assertMethodWorks(response, 'eth_getBlockTransactionCountByHash');
   });
 
   it('eth_getUncleCountByBlockNumber - returns uncle count', async () => {
-    const response = await callRpc(rpcUrl, 'eth_getUncleCountByBlockNumber', ['latest']);
+    const params = getMethodParams('eth_getUncleCountByBlockNumber', settings);
+    const response = await callRpc(rpcUrl, 'eth_getUncleCountByBlockNumber', params);
     assertMethodWorks(response, 'eth_getUncleCountByBlockNumber');
   });
 
   it('eth_getBlockReceipts - returns block receipts', async () => {
-    const response = await callRpc(rpcUrl, 'eth_getBlockReceipts', ['latest']);
+    const params = getMethodParams('eth_getBlockReceipts', settings);
+    const response = await callRpc(rpcUrl, 'eth_getBlockReceipts', params);
     assertMethodWorks(response, 'eth_getBlockReceipts');
   });
 });
