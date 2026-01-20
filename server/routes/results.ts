@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { loadResults } from '../services/storage.js';
+import { loadResults, maskSensitiveResults } from '../services/storage.js';
 
 const router = Router();
 
@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
       res.json({ lastRun: null, endpoints: {} });
       return;
     }
-    res.json(results);
+    res.json(maskSensitiveResults(results));
   } catch (error) {
     res.status(500).json({ error: 'Failed to load results' });
   }

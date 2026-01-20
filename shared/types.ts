@@ -1,8 +1,16 @@
 export type TestStatus = 'pass' | 'fail' | 'timeout' | 'unsupported' | 'skipped';
 
+export interface LatestData {
+  blockNumber: string;  // Hex string
+  blockHash: string;    // 32-byte hex
+  txHash: string;       // 32-byte hex
+}
+
 export interface Endpoint {
   url: string;
   name: string;
+  delayBetweenCallsMs?: number;  // Optional per-endpoint override
+  sensitive?: boolean;  // If true, URL is hidden in UI and API responses
 }
 
 export interface TestSettings {
@@ -21,11 +29,11 @@ export interface MethodCategories {
   filter: string[];
   archive: string[];
   bor: string[];
-  erigon: string[];
   debug: string[];
   trace: string[];
   txpool: string[];
   websocket: string[];
+  batch: string[];
 }
 
 export interface Config {
@@ -38,6 +46,7 @@ export interface TestResult {
   status: TestStatus;
   responseMs?: number;
   error?: string;
+  response?: unknown;
 }
 
 export interface EndpointResults {
@@ -46,6 +55,7 @@ export interface EndpointResults {
   nodeType: 'archive' | 'full' | 'unknown';
   avgResponseMs: number;
   results: Record<string, TestResult>;
+  sensitive?: boolean;  // If true, URL is hidden in UI and API responses
 }
 
 export interface Results {
@@ -65,6 +75,8 @@ export interface ProgressEvent {
   responseMs?: number;
   runDurationMs?: number;
   error?: string;
+  globalCompleted?: number;
+  globalTotal?: number;
 }
 
 export type Category = keyof MethodCategories;

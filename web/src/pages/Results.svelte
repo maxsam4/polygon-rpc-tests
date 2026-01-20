@@ -14,7 +14,7 @@
 
   $: filteredData = $endpointSummaries.filter(ep =>
     ep.name.toLowerCase().includes(filter.toLowerCase()) ||
-    ep.url.toLowerCase().includes(filter.toLowerCase())
+    (!ep.sensitive && ep.url.toLowerCase().includes(filter.toLowerCase()))
   );
 
   onMount(async () => {

@@ -13,12 +13,26 @@ export const categories: Category[] = [
   'filter',
   'archive',
   'bor',
-  'erigon',
   'debug',
   'trace',
   'txpool',
   'websocket',
 ];
+
+// Determine which category a method belongs to (order matters - first match wins)
+export function getMethodCategory(method: string): Category {
+  if (method.endsWith(':archive')) return 'archive';
+  if (method.startsWith('eth_subscribe:')) return 'websocket';
+  if (method.startsWith('bor_')) return 'bor';
+  if (method.startsWith('debug_')) return 'debug';
+  if (method.startsWith('trace_')) return 'trace';
+  if (method.startsWith('txpool_')) return 'txpool';
+  if (method.includes('Filter') || method === 'eth_getLogs') return 'filter';
+  if (method.includes('Transaction') && !method.includes('Count')) return 'transaction';
+  if (method.includes('Block') || method.includes('Uncle')) return 'block';
+  if (['eth_getBalance', 'eth_getStorageAt', 'eth_getTransactionCount', 'eth_getCode', 'eth_call', 'eth_estimateGas', 'eth_createAccessList'].includes(method)) return 'state';
+  return 'basic';
+}
 
 export interface EndpointSummary {
   id: string;
@@ -26,6 +40,7 @@ export interface EndpointSummary {
   url: string;
   nodeType: string;
   avgResponseMs: number;
+  sensitive?: boolean;
   categorySummaries: Record<Category, { passed: number; total: number; status: 'pass' | 'partial' | 'fail' | 'none' }>;
 }
 
@@ -37,27 +52,7 @@ export const endpointSummaries = derived(results, ($results): EndpointSummary[] 
 
     for (const category of categories) {
       const methodsInCategory = Object.entries(endpoint.results)
-        .filter(([method]) => {
-          // Match methods to categories based on naming
-          if (category === 'archive') return method.endsWith(':archive');
-          if (category === 'websocket') return method.startsWith('eth_subscribe:');
-          if (category === 'bor') return method.startsWith('bor_');
-          if (category === 'erigon') return method.startsWith('erigon_');
-          if (category === 'debug') return method.startsWith('debug_');
-          if (category === 'trace') return method.startsWith('trace_');
-          if (category === 'txpool') return method.startsWith('txpool_');
-          if (category === 'filter') return method.includes('Filter') || method === 'eth_getLogs';
-          if (category === 'transaction') return method.includes('Transaction') && !method.includes('Count');
-          if (category === 'block') return method.includes('Block') || method.includes('Uncle');
-          if (category === 'state') {
-            return ['eth_getBalance', 'eth_getStorageAt', 'eth_getTransactionCount', 'eth_getCode', 'eth_call', 'eth_estimateGas', 'eth_createAccessList'].includes(method);
-          }
-          if (category === 'basic') {
-            return method.startsWith('web3_') || method.startsWith('net_') ||
-              ['eth_protocolVersion', 'eth_syncing', 'eth_coinbase', 'eth_chainId', 'eth_mining', 'eth_hashrate', 'eth_gasPrice', 'eth_accounts', 'eth_blockNumber', 'eth_maxPriorityFeePerGas', 'eth_feeHistory', 'eth_blobBaseFee'].includes(method);
-          }
-          return false;
-        });
+        .filter(([method]) => getMethodCategory(method) === category);
 
       const passed = methodsInCategory.filter(([, r]) => r.status === 'pass').length;
       const total = methodsInCategory.length;
@@ -78,6 +73,7 @@ export const endpointSummaries = derived(results, ($results): EndpointSummary[] 
       url: endpoint.url,
       nodeType: endpoint.nodeType,
       avgResponseMs: endpoint.avgResponseMs,
+      sensitive: endpoint.sensitive,
       categorySummaries: categorySummaries as Record<Category, { passed: number; total: number; status: 'pass' | 'partial' | 'fail' | 'none' }>,
     };
   });

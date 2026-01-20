@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { link } from 'svelte-spa-router';
-  import { results, loading, error, categories } from '../stores/results';
+  import { results, loading, error, categories, getMethodCategory } from '../stores/results';
   import { fetchResults } from '../lib/api';
   import StatusBadge from '../components/StatusBadge.svelte';
-  import type { EndpointResults, TestResult, Category } from '../../../shared/types';
+  import type { EndpointResults, TestResult, Category, TestSettings } from '../../../shared/types';
+  import { getMethodParams, getActualMethod } from '../../../shared/rpcParams';
 
   export let params: { id: string } = { id: '' };
 
@@ -12,6 +13,44 @@
   let filterText = '';
   let filterCategory: Category | 'all' = 'all';
   let filterStatus: 'all' | 'pass' | 'fail' | 'timeout' | 'unsupported' | 'skipped' = 'all';
+  let toastMessage = '';
+  let showToast = false;
+
+  // Default test settings for generating curl commands
+  const defaultTestSettings: TestSettings = {
+    timeoutMs: 10000,
+    delayBetweenCallsMs: 100,
+    archiveBlockNumber: 35000000,
+    archiveTestAddress: '0x0000000000000000000000000000000000001010',
+    concurrency: 5,
+  };
+
+  function generateCurl(method: string, url: string): string {
+    const actualMethod = getActualMethod(method);
+    const methodParams = getMethodParams(method, defaultTestSettings);
+    const payload = {
+      jsonrpc: '2.0',
+      id: 1,
+      method: actualMethod,
+      params: methodParams,
+    };
+    return `curl -X POST ${url} -H "Content-Type: application/json" -d '${JSON.stringify(payload)}'`;
+  }
+
+  async function copyToClipboard(method: string) {
+    if (!endpoint || endpoint.sensitive) return;
+    const curl = generateCurl(method, endpoint.url);
+    try {
+      await navigator.clipboard.writeText(curl);
+      toastMessage = 'Curl command copied!';
+      showToast = true;
+      setTimeout(() => { showToast = false; }, 2000);
+    } catch {
+      toastMessage = 'Failed to copy';
+      showToast = true;
+      setTimeout(() => { showToast = false; }, 2000);
+    }
+  }
 
   $: if ($results && params.id) {
     endpoint = $results.endpoints[params.id] || null;
@@ -34,21 +73,6 @@
         })
         .sort((a, b) => a[0].localeCompare(b[0]))
     : [];
-
-  function getMethodCategory(method: string): Category {
-    if (method.endsWith(':archive')) return 'archive';
-    if (method.startsWith('eth_subscribe:')) return 'websocket';
-    if (method.startsWith('bor_')) return 'bor';
-    if (method.startsWith('erigon_')) return 'erigon';
-    if (method.startsWith('debug_')) return 'debug';
-    if (method.startsWith('trace_')) return 'trace';
-    if (method.startsWith('txpool_')) return 'txpool';
-    if (method.includes('Filter') || method === 'eth_getLogs') return 'filter';
-    if (method.includes('Transaction') && !method.includes('Count')) return 'transaction';
-    if (method.includes('Block') || method.includes('Uncle')) return 'block';
-    if (['eth_getBalance', 'eth_getStorageAt', 'eth_getTransactionCount', 'eth_getCode', 'eth_call', 'eth_estimateGas', 'eth_createAccessList'].includes(method)) return 'state';
-    return 'basic';
-  }
 
   onMount(async () => {
     if (!$results) {
@@ -77,7 +101,11 @@
     <div class="endpoint-header">
       <h2>{endpoint.name}</h2>
       <div class="endpoint-meta">
-        <span class="url">{endpoint.url}</span>
+        {#if endpoint.sensitive}
+          <span class="url sensitive">URL hidden (sensitive endpoint)</span>
+        {:else}
+          <span class="url">{endpoint.url}</span>
+        {/if}
         <span class="node-type">Node Type: <strong>{endpoint.nodeType}</strong></span>
         <span class="avg-response">Avg Response: <strong>{endpoint.avgResponseMs}ms</strong></span>
       </div>
@@ -112,23 +140,40 @@
           <th>Category</th>
           <th>Status</th>
           <th>Response Time</th>
-          <th>Error</th>
+          <th>Response</th>
         </tr>
       </thead>
       <tbody>
         {#each methodEntries as [method, result]}
           <tr>
-            <td class="method">{method}</td>
+            <td
+              class="method"
+              class:clickable={!endpoint.sensitive}
+              onclick={() => copyToClipboard(method)}
+              title={endpoint.sensitive ? 'Curl disabled for sensitive endpoints' : 'Click to copy curl command'}
+            >{method}</td>
             <td class="category">{getMethodCategory(method)}</td>
             <td><StatusBadge status={result.status} /></td>
             <td class="response-time">
               {result.responseMs ? `${result.responseMs}ms` : '—'}
             </td>
-            <td class="error-cell">{result.error || '—'}</td>
+            <td class="response-cell" class:error={result.error} class:success={!result.error && result.response !== undefined}>
+              {#if result.error}
+                {result.error}
+              {:else if result.response !== undefined}
+                {typeof result.response === 'string' ? result.response : JSON.stringify(result.response).slice(0, 200)}
+              {:else}
+                —
+              {/if}
+            </td>
           </tr>
         {/each}
       </tbody>
     </table>
+  {/if}
+
+  {#if showToast}
+    <div class="toast">{toastMessage}</div>
   {/if}
 </div>
 
@@ -172,6 +217,11 @@
     background-color: var(--bg-secondary);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
+  }
+
+  .url.sensitive {
+    font-style: italic;
+    color: var(--text-secondary);
   }
 
   .controls {
@@ -224,12 +274,49 @@
     font-family: monospace;
   }
 
-  .error-cell {
-    color: var(--error);
+  .response-cell {
     font-size: 0.75rem;
-    max-width: 300px;
+    max-width: 400px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-family: monospace;
+  }
+
+  .response-cell.error {
+    color: var(--error);
+  }
+
+  .response-cell.success {
+    color: var(--success, #22c55e);
+  }
+
+  .clickable {
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+
+  .clickable:hover {
+    color: var(--primary, #3b82f6);
+    text-decoration: underline;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--bg-secondary, #374151);
+    color: var(--text-primary, #fff);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
 </style>

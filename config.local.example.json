@@ -1,0 +1,8 @@
+{
+  "endpoints": [
+    {
+      "url": "https://your-private-rpc.example.com",
+      "name": "My Private RPC"
+    }
+  ]
+}
