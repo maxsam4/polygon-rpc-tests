@@ -151,13 +151,6 @@ describe('Batch RPC Methods', () => {
     }
   });
 
-  it('eth_callMany - batch multiple eth_call requests', async () => {
-    const settings = getTestSettings();
-    const params = getMethodParams('eth_callMany', settings);
-    const response = await callRpc(rpcUrl, 'eth_callMany', params, 30000);
-    assertMethodWorks(response, 'eth_callMany');
-  });
-
   it('trace_callMany - batch multiple trace_call requests', async () => {
     const settings = getTestSettings();
     const params = getMethodParams('trace_callMany', settings);

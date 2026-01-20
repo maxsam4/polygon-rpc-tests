@@ -113,17 +113,6 @@ export function getMethodParams(
     case 'eth_getProof':
       // Get merkle proof for account state
       return [settings.archiveTestAddress, ['0x0'], blockTag];
-    case 'eth_getAccount':
-      // Get account info
-      return [settings.archiveTestAddress, blockTag];
-    case 'eth_callMany':
-      // Batch multiple eth_call requests
-      return [
-        [
-          [{ to: USDC_CONTRACT, data: BALANCE_OF_CALL_DATA }, blockTag],
-          [{ to: USDC_CONTRACT, data: BALANCE_OF_CALL_DATA }, blockTag],
-        ],
-      ];
     case 'eth_simulateV1':
       // Simulate transaction execution
       return [

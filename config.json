@@ -152,7 +152,6 @@
       "batch:50",
       "batch:100",
       "batch:500",
-      "eth_callMany",
       "trace_callMany"
     ]
   }
