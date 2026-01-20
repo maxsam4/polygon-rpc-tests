@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { getRpcUrl } from './helpers.js';
+import { getRpcUrl, callRpc, assertMethodWorks, getMethodParams, getTestSettings } from './helpers.js';
 
 interface RpcResponse {
   id?: number;
@@ -136,5 +136,32 @@ describe('Batch RPC Methods', () => {
     for (const item of response) {
       expect(item.result).toBeDefined();
     }
+  });
+
+  it('batch:500 - extra large batch request', async () => {
+    const response = await executeBatchCall(rpcUrl, 500);
+    if (!isBatchSupported(response)) {
+      console.log('Batch requests not supported, skipping test');
+      return;
+    }
+    expect(Array.isArray(response)).toBe(true);
+    expect(response).toHaveLength(500);
+    for (const item of response) {
+      expect(item.result).toBeDefined();
+    }
+  });
+
+  it('eth_callMany - batch multiple eth_call requests', async () => {
+    const settings = getTestSettings();
+    const params = getMethodParams('eth_callMany', settings);
+    const response = await callRpc(rpcUrl, 'eth_callMany', params, 30000);
+    assertMethodWorks(response, 'eth_callMany');
+  });
+
+  it('trace_callMany - batch multiple trace_call requests', async () => {
+    const settings = getTestSettings();
+    const params = getMethodParams('trace_callMany', settings);
+    const response = await callRpc(rpcUrl, 'trace_callMany', params, 30000);
+    assertMethodWorks(response, 'trace_callMany');
   });
 });

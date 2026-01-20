@@ -138,7 +138,7 @@ export function assertMethodWorks(response: RpcResponse, method: string): void {
 
 /**
  * Collect latest blockchain data for non-archive method tests.
- * Fetches a recent block (5 blocks behind latest for stability) and extracts
+ * Fetches a recent block (10 blocks behind latest for stability) and extracts
  * the block hash and a transaction hash from it.
  */
 export async function collectLatestData(
@@ -150,9 +150,9 @@ export async function collectLatestData(
     const blockNumResponse = await callRpc(url, 'eth_blockNumber', [], timeoutMs);
     if (!blockNumResponse.result) return null;
 
-    // Use a block 5 behind latest for stability
+    // Use a block 10 behind latest for stability (helps with trace methods)
     const latestNum = parseInt(blockNumResponse.result as string, 16);
-    const targetNum = latestNum - 5;
+    const targetNum = latestNum - 10;
     const targetBlockHex = `0x${targetNum.toString(16)}`;
 
     // Get block with transactions

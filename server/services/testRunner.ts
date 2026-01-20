@@ -63,7 +63,7 @@ async function createFilterId(
 
 /**
  * Collect latest blockchain data for non-archive method tests.
- * Fetches a recent block (5 blocks behind latest for stability) and extracts
+ * Fetches a recent block (10 blocks behind latest for stability) and extracts
  * the block hash and a transaction hash from it.
  */
 async function collectLatestData(
@@ -89,9 +89,9 @@ async function collectLatestData(
     const blockNumData = await blockNumResponse.json();
     if (!blockNumData.result) return null;
 
-    // Use a block 5 behind latest for stability
+    // Use a block 10 behind latest for stability (helps with trace methods)
     const latestNum = parseInt(blockNumData.result, 16);
-    const targetNum = latestNum - 5;
+    const targetNum = latestNum - 10;
     const targetBlockHex = `0x${targetNum.toString(16)}`;
 
     // Get block with transactions

@@ -33,7 +33,6 @@
       "eth_getTransactionCount",
       "eth_getCode",
       "eth_call",
-      "eth_callMany",
       "eth_estimateGas",
       "eth_createAccessList",
       "eth_getProof",
@@ -117,7 +116,6 @@
     ],
     "trace": [
       "trace_call",
-      "trace_callMany",
       "trace_rawTransaction",
       "trace_replayBlockTransactions",
       "trace_replayTransaction",
@@ -143,7 +141,10 @@
       "batch:5",
       "batch:10",
       "batch:50",
-      "batch:100"
+      "batch:100",
+      "batch:500",
+      "eth_callMany",
+      "trace_callMany"
     ]
   }
 }

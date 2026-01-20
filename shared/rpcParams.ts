@@ -251,7 +251,7 @@ export function getMethodParams(
     case 'trace_block':
       return [getBlockNumber()];
     case 'trace_filter':
-      return [{ fromBlock: 'latest', toBlock: 'latest' }];
+      return [{ fromBlock: getBlockNumber(), toBlock: getBlockNumber() }];
     case 'trace_get':
       return [getTxHash(), ['0x0']];
     case 'trace_transaction':
