@@ -1,11 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { push } from 'svelte-spa-router';
-  import { results, loading, error, endpointSummaries, categories } from '../stores/results';
+  import { results, loading, error, endpointSummaries, categories, type EndpointSummary } from '../stores/results';
   import { fetchResults } from '../lib/api';
   import StatusBadge from '../components/StatusBadge.svelte';
+  import type { Category } from '../../../shared/types';
 
   let filter = '';
+
+  function getCategorySummary(endpoint: EndpointSummary, category: Category) {
+    return endpoint.categorySummaries[category];
+  }
 
   $: filteredData = $endpointSummaries.filter(ep =>
     ep.name.toLowerCase().includes(filter.toLowerCase()) ||
@@ -72,10 +77,9 @@
               </td>
               {#each categories as category}
                 <td class="category-col">
-                  {@const summary = endpoint.categorySummaries[category]}
                   <StatusBadge
-                    status={summary.status}
-                    text={summary.total > 0 ? `${summary.passed}/${summary.total}` : ''}
+                    status={getCategorySummary(endpoint, category).status}
+                    text={getCategorySummary(endpoint, category).total > 0 ? `${getCategorySummary(endpoint, category).passed}/${getCategorySummary(endpoint, category).total}` : ''}
                   />
                 </td>
               {/each}
