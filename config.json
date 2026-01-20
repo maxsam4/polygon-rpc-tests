@@ -1,10 +1,24 @@
 {
   "endpoints": [
     { "url": "https://polygon.drpc.org", "name": "dRPC public" },
+    { "url": "wss://polygon.drpc.org", "name": "dRPC WSS" },
     { "url": "https://polygon-bor-rpc.publicnode.com", "name": "PublicNode" },
+    { "url": "wss://polygon-bor-rpc.publicnode.com", "name": "PublicNode WSS" },
     { "url": "https://polygon-rpc.com", "name": "Polygon RPC", "delayBetweenCallsMs": 500 },
     { "url": "https://polygon.gateway.tenderly.co", "name": "Tenderly", "delayBetweenCallsMs": 500 },
-    { "url": "https://polygon.lava.build", "name": "Lava" }
+    { "url": "wss://polygon.gateway.tenderly.co", "name": "Tenderly WSS" },
+    { "url": "https://polygon.lava.build", "name": "Lava" },
+    { "url": "https://api.zan.top/polygon-mainnet", "name": "ZAN" },
+    { "url": "https://polygon-public.nodies.app", "name": "Nodies" },
+    { "url": "https://1rpc.io/matic", "name": "1RPC" },
+    { "url": "https://polygon.rpc.subquery.network/public", "name": "SubQuery" },
+    { "url": "https://rpc-mainnet.matic.quiknode.pro", "name": "QuikNode" },
+    { "url": "https://polygon-mainnet.gateway.tatum.io", "name": "Tatum" },
+    { "url": "https://endpoints.omniatech.io/v1/matic/mainnet/public", "name": "Omnia" },
+    { "url": "https://poly.api.pocket.network", "name": "Pocket Network" },
+    { "url": "https://rpc.owlracle.info/poly/70d38ce1826c4a60bb2a8e05a6c8b20f", "name": "Owlracle", "sensitive": true },
+    { "url": "https://go.getblock.io/02667b699f05444ab2c64f9bff28f027", "name": "GetBlock", "sensitive": true },
+    { "url": "https://polygon-mainnet.rpcfast.com?api_key=xbhWBI1Wkguk8SNMu1bvvLurPGLXmgwYeC4S6g2H7WdwFigZSmPWVZRxrskEQwIf", "name": "RPCFast", "sensitive": true }
   ],
   "testSettings": {
     "timeoutMs": 10000,
