@@ -23,8 +23,8 @@ app.use('/api/tests', testsRouter);
 const staticPath = path.join(__dirname, '../web/dist');
 app.use(express.static(staticPath));
 
-// SPA fallback
-app.get('*', (req, res) => {
+// SPA fallback - use named wildcard for path-to-regexp v8+ compatibility
+app.get('/{*path}', (req, res) => {
   if (!req.path.startsWith('/api')) {
     res.sendFile(path.join(staticPath, 'index.html'));
   }
