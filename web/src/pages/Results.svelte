@@ -94,7 +94,12 @@
               <td class="endpoint-col">
                 <div class="endpoint-info">
                   <span class="name">{endpoint.name}</span>
-                  <span class="node-type">{endpoint.nodeType}</span>
+                  <span class="meta">
+                    <span class="node-type">{endpoint.nodeType}</span>
+                    {#if endpoint.medianResponseMs > 0}
+                      <span class="response-time">p50: {endpoint.medianResponseMs}ms</span>
+                    {/if}
+                  </span>
                 </div>
               </td>
               <td class="total-col">
@@ -211,9 +216,18 @@
     font-weight: 500;
   }
 
-  .node-type {
+  .meta {
+    display: flex;
+    gap: 0.75rem;
     font-size: 0.75rem;
     color: var(--text-secondary);
+  }
+
+  .node-type {
     text-transform: capitalize;
+  }
+
+  .response-time {
+    font-family: monospace;
   }
 </style>

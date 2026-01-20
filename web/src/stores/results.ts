@@ -43,6 +43,7 @@ export interface EndpointSummary {
   url: string;
   nodeType: string;
   avgResponseMs: number;
+  medianResponseMs: number;
   sensitive?: boolean;
   categorySummaries: Record<Category, { passed: number; total: number; status: 'pass' | 'partial' | 'fail' | 'none' }>;
 }
@@ -76,6 +77,7 @@ export const endpointSummaries = derived(results, ($results): EndpointSummary[] 
       url: endpoint.url,
       nodeType: endpoint.nodeType,
       avgResponseMs: endpoint.avgResponseMs,
+      medianResponseMs: endpoint.medianResponseMs,
       sensitive: endpoint.sensitive,
       categorySummaries: categorySummaries as Record<Category, { passed: number; total: number; status: 'pass' | 'partial' | 'fail' | 'none' }>,
     };

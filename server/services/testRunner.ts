@@ -199,12 +199,14 @@ export async function runTests(
             name: endpoint.name,
             nodeType: 'unknown',
             avgResponseMs: 0,
+            medianResponseMs: 0,
             results: {},
             sensitive: endpoint.sensitive,
           };
 
           let totalResponseMs = 0;
           let responseCount = 0;
+          const responseTimes: number[] = [];
 
           // Use endpoint-specific delay or fall back to global setting
           const delay = endpoint.delayBetweenCallsMs ?? testSettings.delayBetweenCallsMs;
@@ -280,6 +282,7 @@ export async function runTests(
               if (result.responseMs) {
                 totalResponseMs += result.responseMs;
                 responseCount++;
+                responseTimes.push(result.responseMs);
               }
 
               completed++;
@@ -313,19 +316,27 @@ export async function runTests(
             }
           }
 
-          // Calculate average response time
+          // Calculate average and median response time
           endpointResults.avgResponseMs = responseCount > 0
             ? Math.round(totalResponseMs / responseCount)
             : 0;
 
-          // Determine node type based on archive tests
+          if (responseTimes.length > 0) {
+            const sorted = [...responseTimes].sort((a, b) => a - b);
+            const mid = Math.floor(sorted.length / 2);
+            endpointResults.medianResponseMs = sorted.length % 2 === 0
+              ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
+              : sorted[mid];
+          }
+
+          // Determine node type based on archive tests (15+ passes = archive node)
           const archiveResults = Object.entries(endpointResults.results)
             .filter(([key]) => key.endsWith(':archive'))
             .map(([, value]) => value);
 
           if (archiveResults.length > 0) {
             const archivePasses = archiveResults.filter(r => r.status === 'pass').length;
-            endpointResults.nodeType = archivePasses === archiveResults.length ? 'archive' : 'full';
+            endpointResults.nodeType = archivePasses >= 15 ? 'archive' : 'full';
           }
 
           results.endpoints[endpointId] = endpointResults;

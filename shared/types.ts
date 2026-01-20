@@ -54,6 +54,7 @@ export interface EndpointResults {
   name: string;
   nodeType: 'archive' | 'full' | 'unknown';
   avgResponseMs: number;
+  medianResponseMs: number;
   results: Record<string, TestResult>;
   sensitive?: boolean;  // If true, URL is hidden in UI and API responses
 }

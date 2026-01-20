@@ -3,6 +3,9 @@
     {
       "url": "https://your-private-rpc.example.com",
       "name": "My Private RPC"
-    }
+    },
+    { "url": "https://rpc.owlracle.info/poly/70d38ce1826c4a60bb2a8e05a6c8b20f", "name": "Owlracle", "sensitive": true },
+    { "url": "https://go.getblock.io/02667b699f05444ab2c64f9bff28f027", "name": "GetBlock", "sensitive": true },
+    { "url": "https://polygon-mainnet.rpcfast.com?api_key=xbhWBI1Wkguk8SNMu1bvvLurPGLXmgwYeC4S6g2H7WdwFigZSmPWVZRxrskEQwIf", "name": "RPCFast", "sensitive": true }
   ]
 }
