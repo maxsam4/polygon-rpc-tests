@@ -65,11 +65,12 @@ async function createFilterId(
  * Collect latest blockchain data for non-archive method tests.
  * Fetches a recent block (10 blocks behind latest for stability) and extracts
  * the block hash and a transaction hash from it.
+ * Throws an error if data cannot be collected - this should fail the endpoint tests.
  */
 async function collectLatestData(
   endpointUrl: string,
   timeoutMs: number
-): Promise<LatestData | null> {
+): Promise<LatestData> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -87,7 +88,9 @@ async function collectLatestData(
       signal: controller.signal,
     });
     const blockNumData = await blockNumResponse.json();
-    if (!blockNumData.result) return null;
+    if (!blockNumData.result) {
+      throw new Error('Failed to get block number from endpoint');
+    }
 
     // Use a block 10 behind latest for stability (helps with trace methods)
     const latestNum = parseInt(blockNumData.result, 16);
@@ -108,7 +111,9 @@ async function collectLatestData(
     });
     const blockData = await blockResponse.json();
 
-    if (!blockData.result) return null;
+    if (!blockData.result) {
+      throw new Error('Failed to get block data from endpoint');
+    }
 
     const block = blockData.result;
     const blockHash = block.hash;
@@ -118,8 +123,8 @@ async function collectLatestData(
     if (block.transactions && block.transactions.length > 0) {
       txHash = block.transactions[0].hash;
     } else {
-      // Search up to 10 recent blocks for a transaction
-      for (let i = 1; i <= 10; i++) {
+      // Search up to 20 recent blocks for a transaction (Polygon always has txs)
+      for (let i = 1; i <= 20; i++) {
         const searchBlockHex = `0x${(targetNum - i).toString(16)}`;
         const searchResponse = await fetch(endpointUrl, {
           method: 'POST',
@@ -140,15 +145,15 @@ async function collectLatestData(
       }
     }
 
-    if (!txHash) return null;
+    if (!txHash) {
+      throw new Error('No transactions found in recent blocks');
+    }
 
     return {
       blockNumber: targetBlockHex,
       blockHash,
       txHash,
     };
-  } catch {
-    return null;
   } finally {
     clearTimeout(timeoutId);
   }
@@ -212,13 +217,36 @@ export async function runTests(
           const delay = endpoint.delayBetweenCallsMs ?? testSettings.delayBetweenCallsMs;
 
           // Collect latest blockchain data once per endpoint for non-archive tests
-          const latestData = await collectLatestData(endpoint.url, testSettings.timeoutMs);
+          let latestData: LatestData;
+          try {
+            latestData = await collectLatestData(endpoint.url, testSettings.timeoutMs);
+          } catch (err) {
+            // If we can't collect latest data, mark all non-archive tests as failed
+            const errorMsg = err instanceof Error ? err.message : 'Failed to collect blockchain data';
+            for (const category of categories) {
+              for (const method of methods[category]) {
+                const isArchive = method.endsWith(':archive');
+                if (!isArchive) {
+                  endpointResults.results[method] = { status: 'fail', error: errorMsg };
+                  globalCompleted++;
+                }
+              }
+            }
+            // Continue with archive tests using a dummy latestData (won't be used for archive)
+            latestData = { blockNumber: '0x0', blockHash: '0x0', txHash: '0x0' };
+          }
 
           for (const category of categories) {
             const categoryMethods = methods[category];
             let completed = 0;
 
             for (const method of categoryMethods) {
+              // Skip if already marked as failed (e.g., from latestData collection failure)
+              if (endpointResults.results[method]) {
+                completed++;
+                continue;
+              }
+
               // Check if this is a batch method
               const batchSize = getBatchSize(method);
               let result: TestResult;

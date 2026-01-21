@@ -39,7 +39,8 @@ export function getActualMethod(method: string): string {
  *
  * @param method - The RPC method name (may include :archive suffix)
  * @param settings - Test settings containing archive block number and test address
- * @param latestData - Optional latest blockchain data for non-archive methods
+ * @param latestData - Latest blockchain data (current - 10 blocks) for non-archive methods.
+ *                     Required for non-archive methods; testRunner guarantees this is available.
  */
 export function getMethodParams(
   method: string,
@@ -56,24 +57,13 @@ export function getMethodParams(
   const blockTag = isArchive ? archiveBlockTag : 'latest';
 
   // Helper to get block hash - archive uses block 35M, latest uses current - 10 blocks
-  const getBlockHash = () => {
-    if (isArchive) return KNOWN_BLOCK_HASH;
-    if (!latestData?.blockHash) throw new Error('latestData.blockHash required for non-archive methods');
-    return latestData.blockHash;
-  };
+  const getBlockHash = () => isArchive ? KNOWN_BLOCK_HASH : latestData!.blockHash;
 
   // Helper to get block number - archive uses block 35M, latest uses current - 10 blocks
-  const getBlockNumber = () => {
-    if (isArchive) return archiveBlockTag;
-    return latestData?.blockNumber ?? 'latest';
-  };
+  const getBlockNumber = () => isArchive ? archiveBlockTag : latestData!.blockNumber;
 
   // Helper to get tx hash - archive uses tx from block 35M, latest uses current - 10 blocks
-  const getTxHash = () => {
-    if (isArchive) return KNOWN_TX_HASH;
-    if (!latestData?.txHash) throw new Error('latestData.txHash required for non-archive methods');
-    return latestData.txHash;
-  };
+  const getTxHash = () => isArchive ? KNOWN_TX_HASH : latestData!.txHash;
 
   switch (baseMethod) {
     // Basic methods
@@ -207,11 +197,7 @@ export function getMethodParams(
       return [getBlockHash(), '0x0', '0x0000000000000000000000000000000000000000000000000000000000000000', '0x64'];
     case 'debug_getModifiedAccountsByNumber':
       // Requires actual block numbers, not 'latest' tag
-      if (isArchive) {
-        return [archiveBlockTag, archiveBlockTag];
-      }
-      if (!latestData?.blockNumber) throw new Error('latestData.blockNumber required for debug_getModifiedAccountsByNumber');
-      return [latestData.blockNumber, latestData.blockNumber];
+      return [getBlockNumber(), getBlockNumber()];
     case 'debug_getModifiedAccountsByHash':
       return [getBlockHash(), getBlockHash()];
 
