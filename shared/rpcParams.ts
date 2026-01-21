@@ -50,19 +50,30 @@ export function getMethodParams(
   const isArchive = method.endsWith(':archive');
   const baseMethod = isArchive ? method.replace(':archive', '') : method;
 
-  // For archive methods, always use known constants
-  // For latest methods, use latestData if available, otherwise fall back to 'latest' tag or known constants
+  // For archive methods: use known constants from block 35M
+  // For latest methods: use latestData (current block - 10) for stability
   const archiveBlockTag = `0x${settings.archiveBlockNumber.toString(16)}`;
   const blockTag = isArchive ? archiveBlockTag : 'latest';
 
-  // Helper to get block hash - archive uses KNOWN_BLOCK_HASH, latest uses latestData or KNOWN_BLOCK_HASH
-  const getBlockHash = () => isArchive ? KNOWN_BLOCK_HASH : (latestData?.blockHash ?? KNOWN_BLOCK_HASH);
+  // Helper to get block hash - archive uses block 35M, latest uses current - 10 blocks
+  const getBlockHash = () => {
+    if (isArchive) return KNOWN_BLOCK_HASH;
+    if (!latestData?.blockHash) throw new Error('latestData.blockHash required for non-archive methods');
+    return latestData.blockHash;
+  };
 
-  // Helper to get block number - archive uses archiveBlockTag, latest uses latestData or 'latest'
-  const getBlockNumber = () => isArchive ? archiveBlockTag : (latestData?.blockNumber ?? 'latest');
+  // Helper to get block number - archive uses block 35M, latest uses current - 10 blocks
+  const getBlockNumber = () => {
+    if (isArchive) return archiveBlockTag;
+    return latestData?.blockNumber ?? 'latest';
+  };
 
-  // Helper to get tx hash - archive uses KNOWN_TX_HASH, latest uses latestData or KNOWN_TX_HASH
-  const getTxHash = () => isArchive ? KNOWN_TX_HASH : (latestData?.txHash ?? KNOWN_TX_HASH);
+  // Helper to get tx hash - archive uses tx from block 35M, latest uses current - 10 blocks
+  const getTxHash = () => {
+    if (isArchive) return KNOWN_TX_HASH;
+    if (!latestData?.txHash) throw new Error('latestData.txHash required for non-archive methods');
+    return latestData.txHash;
+  };
 
   switch (baseMethod) {
     // Basic methods
