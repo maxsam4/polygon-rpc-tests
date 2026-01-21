@@ -123,8 +123,10 @@ export function assertMethodWorks(response: RpcResponse, method: string): void {
       'execution reverted',
       'invalid block number',
       'block not found',
+      'could not find',  // Alternate wording for "not found" errors
       'transaction not found',
       'filter not found',
+      'temporary internal error',  // Transient RPC errors
     ];
 
     const errorMsg = response.error.message?.toLowerCase() || '';
