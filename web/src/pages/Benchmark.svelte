@@ -84,6 +84,36 @@
     return `${pct.toFixed(1)}%`;
   }
 
+  interface ResponseTimeStats {
+    min: number | null;
+    max: number | null;
+    p50: number | null;
+    p95: number | null;
+  }
+
+  function getResponseTimeStats(history: { responseMs: number | null; success: boolean }[]): ResponseTimeStats {
+    const times = history
+      .filter(p => p.success && p.responseMs !== null)
+      .map(p => p.responseMs as number)
+      .sort((a, b) => a - b);
+
+    if (times.length === 0) {
+      return { min: null, max: null, p50: null, p95: null };
+    }
+
+    const percentile = (arr: number[], p: number): number => {
+      const idx = Math.ceil((p / 100) * arr.length) - 1;
+      return arr[Math.max(0, idx)];
+    };
+
+    return {
+      min: times[0],
+      max: times[times.length - 1],
+      p50: percentile(times, 50),
+      p95: percentile(times, 95),
+    };
+  }
+
   onMount(() => {
     loadConfig();
   });
@@ -176,7 +206,10 @@
             <th class="name-col">Endpoint</th>
             <th class="url-col">URL</th>
             <th class="block-col">Latest Block</th>
-            <th class="time-col">Response Time</th>
+            <th class="time-col">Min</th>
+            <th class="time-col">P50</th>
+            <th class="time-col">P95</th>
+            <th class="time-col">Max</th>
             <th class="reliability-col">Reliability</th>
             <th class="actions-col">Actions</th>
           </tr>
@@ -184,6 +217,7 @@
         <tbody>
           {#each $sortedEndpoints as endpoint}
             {@const latest = endpoint.history.at(-1)}
+            {@const stats = getResponseTimeStats(endpoint.history)}
             <tr>
               <td class="name-col">{endpoint.name}</td>
               <td class="url-col">
@@ -194,7 +228,10 @@
                 {/if}
               </td>
               <td class="block-col">{formatBlockNumber(latest?.blockNumber ?? null)}</td>
-              <td class="time-col">{formatResponseTime(latest?.responseMs ?? null)}</td>
+              <td class="time-col">{formatResponseTime(stats.min)}</td>
+              <td class="time-col">{formatResponseTime(stats.p50)}</td>
+              <td class="time-col">{formatResponseTime(stats.p95)}</td>
+              <td class="time-col">{formatResponseTime(stats.max)}</td>
               <td class="reliability-col">{getReliability(endpoint)}</td>
               <td class="actions-col">
                 {#if endpoint.isTemporary}
@@ -356,7 +393,7 @@
   }
 
   .url-col {
-    min-width: 250px;
+    min-width: 200px;
   }
 
   .url {
@@ -371,8 +408,14 @@
     font-style: italic;
   }
 
-  .block-col, .time-col, .reliability-col {
+  .block-col, .reliability-col {
     min-width: 100px;
+    text-align: right;
+    font-family: monospace;
+  }
+
+  .time-col {
+    min-width: 70px;
     text-align: right;
     font-family: monospace;
   }

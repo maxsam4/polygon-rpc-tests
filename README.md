@@ -131,6 +131,7 @@ The `/benchmark` page provides real-time performance comparison of RPC endpoints
 - **Live Polling**: Calls `eth_blockNumber` on all endpoints at configurable intervals (default: 1s)
 - **Block Number Chart**: Shows which endpoints are returning the latest blocks
 - **Response Time Chart**: Visualizes latency across all endpoints
+- **Response Time Statistics**: Shows min, p50 (median), p95, and max response times per endpoint
 - **Reliability Metrics**: Tracks success rate over time
 - **Temporary Endpoints**: Add custom RPC URLs for comparison
 
