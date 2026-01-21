@@ -7,6 +7,8 @@
   import type { Category } from '../../../shared/types';
 
   let filter = '';
+  let sortColumn: 'name' | 'total' | 'responseTime' | Category = 'total';
+  let sortDirection: 'asc' | 'desc' = 'desc';
 
   function getCategorySummary(endpoint: EndpointSummary, category: Category) {
     return endpoint.categorySummaries[category];
@@ -31,12 +33,33 @@
     return { passed, total, status, text: total > 0 ? `${passed}/${total}` : '' };
   }
 
+  function handleSort(column: typeof sortColumn) {
+    if (sortColumn === column) {
+      sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortColumn = column;
+      sortDirection = column === 'name' ? 'asc' : 'desc';
+    }
+  }
+
+  function getSortValue(endpoint: EndpointSummary, column: typeof sortColumn): number | string {
+    if (column === 'name') return endpoint.name.toLowerCase();
+    if (column === 'total') return getTotalSummary(endpoint).passed;
+    if (column === 'responseTime') return endpoint.medianResponseMs || Infinity;
+    return getCategorySummary(endpoint, column)?.passed ?? 0;
+  }
+
   $: filteredData = $endpointSummaries
     .filter(ep =>
       ep.name.toLowerCase().includes(filter.toLowerCase()) ||
       (!ep.sensitive && ep.url.toLowerCase().includes(filter.toLowerCase()))
     )
-    .sort((a, b) => getTotalSummary(b).passed - getTotalSummary(a).passed);
+    .sort((a, b) => {
+      const aVal = getSortValue(a, sortColumn);
+      const bVal = getSortValue(b, sortColumn);
+      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      return sortDirection === 'asc' ? cmp : -cmp;
+    });
 
   onMount(async () => {
     $loading = true;
@@ -81,10 +104,16 @@
       <table>
         <thead>
           <tr>
-            <th class="endpoint-col">Endpoint</th>
-            <th class="total-col">Total</th>
+            <th class="endpoint-col sortable" on:click={() => handleSort('name')}>
+              Endpoint {sortColumn === 'name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th class="total-col sortable" on:click={() => handleSort('total')}>
+              Total {sortColumn === 'total' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+            </th>
             {#each categories as category}
-              <th class="category-col">{category}</th>
+              <th class="category-col sortable" on:click={() => handleSort(category)}>
+                {category} {sortColumn === category ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+              </th>
             {/each}
           </tr>
         </thead>
@@ -180,6 +209,15 @@
     text-transform: capitalize;
     position: sticky;
     top: 0;
+  }
+
+  th.sortable {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  th.sortable:hover {
+    background-color: var(--bg-tertiary, #e0e0e0);
   }
 
   .endpoint-col {

@@ -13,11 +13,17 @@
   } from '../stores/benchmark';
   import BenchmarkChart from '../components/BenchmarkChart.svelte';
 
+  import type { BenchmarkEndpointData } from '../../../shared/types';
+
   let loading = true;
   let error: string | null = null;
   let newEndpointUrl = '';
   let newEndpointName = '';
   let intervalInput = 1000;
+
+  type SortColumn = 'name' | 'block' | 'min' | 'p50' | 'p95' | 'max' | 'reliability';
+  let sortColumn: SortColumn = 'p50';
+  let sortDirection: 'asc' | 'desc' = 'asc';
 
   async function loadConfig() {
     try {
@@ -114,6 +120,42 @@
     };
   }
 
+  function getReliabilityValue(endpoint: BenchmarkEndpointData): number {
+    if (endpoint.totalCalls === 0) return 0;
+    return endpoint.successfulCalls / endpoint.totalCalls;
+  }
+
+  function getSortValue(endpoint: BenchmarkEndpointData, column: SortColumn): number | string {
+    const stats = getResponseTimeStats(endpoint.history);
+    const latest = endpoint.history.at(-1);
+    switch (column) {
+      case 'name': return endpoint.name.toLowerCase();
+      case 'block': return latest?.blockNumber ?? -Infinity;
+      case 'min': return stats.min ?? Infinity;
+      case 'p50': return stats.p50 ?? Infinity;
+      case 'p95': return stats.p95 ?? Infinity;
+      case 'max': return stats.max ?? Infinity;
+      case 'reliability': return getReliabilityValue(endpoint);
+    }
+  }
+
+  function handleSort(column: SortColumn) {
+    if (sortColumn === column) {
+      sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortColumn = column;
+      // Default directions: name asc, block desc, times asc, reliability desc
+      sortDirection = column === 'name' ? 'asc' : column === 'block' || column === 'reliability' ? 'desc' : 'asc';
+    }
+  }
+
+  $: tableSortedEndpoints = [...$sortedEndpoints].sort((a, b) => {
+    const aVal = getSortValue(a, sortColumn);
+    const bVal = getSortValue(b, sortColumn);
+    const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+    return sortDirection === 'asc' ? cmp : -cmp;
+  });
+
   onMount(() => {
     loadConfig();
   });
@@ -203,19 +245,33 @@
       <table>
         <thead>
           <tr>
-            <th class="name-col">Endpoint</th>
+            <th class="name-col sortable" on:click={() => handleSort('name')}>
+              Endpoint {sortColumn === 'name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+            </th>
             <th class="url-col">URL</th>
-            <th class="block-col">Latest Block</th>
-            <th class="time-col">Min</th>
-            <th class="time-col">P50</th>
-            <th class="time-col">P95</th>
-            <th class="time-col">Max</th>
-            <th class="reliability-col">Reliability</th>
+            <th class="block-col sortable" on:click={() => handleSort('block')}>
+              Latest Block {sortColumn === 'block' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th class="time-col sortable" on:click={() => handleSort('min')}>
+              Min {sortColumn === 'min' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th class="time-col sortable" on:click={() => handleSort('p50')}>
+              P50 {sortColumn === 'p50' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th class="time-col sortable" on:click={() => handleSort('p95')}>
+              P95 {sortColumn === 'p95' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th class="time-col sortable" on:click={() => handleSort('max')}>
+              Max {sortColumn === 'max' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th class="reliability-col sortable" on:click={() => handleSort('reliability')}>
+              Reliability {sortColumn === 'reliability' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+            </th>
             <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {#each $sortedEndpoints as endpoint}
+          {#each tableSortedEndpoints as endpoint}
             {@const latest = endpoint.history.at(-1)}
             {@const stats = getResponseTimeStats(endpoint.history)}
             <tr>
@@ -386,6 +442,15 @@
     font-weight: 600;
     position: sticky;
     top: 0;
+  }
+
+  th.sortable {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  th.sortable:hover {
+    background-color: var(--bg-tertiary, #e0e0e0);
   }
 
   .name-col {
