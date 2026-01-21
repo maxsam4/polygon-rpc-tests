@@ -204,7 +204,7 @@ export function getMethodParams(
     case 'debug_getBadBlocks':
       return [];
     case 'debug_accountRange':
-      return [getBlockHash(), 0, '0x0000000000000000000000000000000000000000000000000000000000000000', 100];
+      return [getBlockHash(), '0x0', '0x0000000000000000000000000000000000000000000000000000000000000000', '0x64'];
     case 'debug_getModifiedAccountsByNumber':
       // Requires actual block numbers, not 'latest' tag
       if (isArchive) {
