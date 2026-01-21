@@ -8,7 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Add tests for changes you make and run the new tests to verify things are working after you're done with changes. Don't run full test suite unless requested.
 - Remove planning files after you're done implementing them
 - When you add new methods, also add corresponding archive method targeting block 35m
-- For non archive methods which takes block or transaction as input, use the freshly fetched data while using hardcoded data for archive
+- For non-archive methods: use data from current block - 10 (latestData in testRunner) for stability
+- For archive methods: use hardcoded data from block 35m (KNOWN_BLOCK_HASH, KNOWN_TX_HASH)
 - commit changes after you're done
 - Update readme.md after changes
 - Update claude.md with notes you think will be helpful later or mistakes i corrected. Keep claude.md succinct.

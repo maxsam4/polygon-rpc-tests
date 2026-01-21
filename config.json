@@ -96,7 +96,8 @@
       "bor_getCurrentValidators",
       "bor_getCurrentProposer",
       "bor_getRootHash",
-      "bor_getSignersAtHash"
+      "bor_getSignersAtHash",
+      "bor_getSignersAtHash:archive"
     ],
     "debug": [
       "debug_traceTransaction",
