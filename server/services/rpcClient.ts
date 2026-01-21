@@ -1,7 +1,7 @@
 import type { TestResult } from '../../shared/types.js';
 
 // Re-export from shared module for backward compatibility
-export { getMethodParams, getActualMethod, getSubscriptionParams } from '../../shared/rpcParams.js';
+export { getMethodParams, getActualMethod } from '../../shared/rpcParams.js';
 
 interface RpcResponse {
   id?: number;
@@ -29,12 +29,6 @@ export async function executeRpcCall(
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const isWebSocket = url.startsWith('wss://') || url.startsWith('ws://');
-
-    if (isWebSocket) {
-      return await executeWebSocketCall(url, method, params, timeoutMs);
-    }
-
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -78,65 +72,6 @@ export async function executeRpcCall(
   } finally {
     clearTimeout(timeoutId);
   }
-}
-
-async function executeWebSocketCall(
-  url: string,
-  method: string,
-  params: unknown[],
-  timeoutMs: number
-): Promise<TestResult> {
-  return new Promise((resolve) => {
-    const start = Date.now();
-    const ws = new WebSocket(url);
-    const timeoutId = setTimeout(() => {
-      ws.close();
-      resolve({ status: 'timeout', responseMs: Date.now() - start });
-    }, timeoutMs);
-
-    ws.onopen = () => {
-      ws.send(JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method,
-        params,
-      }));
-    };
-
-    ws.onmessage = (event) => {
-      clearTimeout(timeoutId);
-      const responseMs = Date.now() - start;
-      try {
-        const data: RpcResponse = JSON.parse(event.data.toString());
-        ws.close();
-
-        if (data.error) {
-          const errorMsg = data.error.message.toLowerCase();
-          if (
-            errorMsg.includes('not found') ||
-            errorMsg.includes('not supported') ||
-            errorMsg.includes('not implemented') ||
-            data.error.code === -32601
-          ) {
-            resolve({ status: 'unsupported', error: data.error.message });
-            return;
-          }
-          resolve({ status: 'fail', responseMs, error: data.error.message });
-          return;
-        }
-        resolve({ status: 'pass', responseMs, response: truncateResponse(data.result, 100) });
-      } catch (e) {
-        ws.close();
-        resolve({ status: 'fail', responseMs, error: 'Invalid JSON response' });
-      }
-    };
-
-    ws.onerror = (error) => {
-      clearTimeout(timeoutId);
-      ws.close();
-      resolve({ status: 'fail', responseMs: Date.now() - start, error: 'WebSocket error' });
-    };
-  });
 }
 
 /**

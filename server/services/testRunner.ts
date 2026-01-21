@@ -8,7 +8,7 @@ import type {
   Category,
   LatestData,
 } from '../../shared/types.js';
-import { executeRpcCall, executeBatchCall, getMethodParams, getActualMethod, getSubscriptionParams } from './rpcClient.js';
+import { executeRpcCall, executeBatchCall, getMethodParams, getActualMethod } from './rpcClient.js';
 import { saveResults } from './storage.js';
 
 type ProgressCallback = (event: ProgressEvent) => void;
@@ -219,25 +219,6 @@ export async function runTests(
             let completed = 0;
 
             for (const method of categoryMethods) {
-              // Skip WebSocket methods for HTTP endpoints and vice versa
-              const isWsEndpoint = endpoint.url.startsWith('wss://') || endpoint.url.startsWith('ws://');
-              const isWsMethod = category === 'websocket';
-
-              if (isWsMethod && !isWsEndpoint) {
-                endpointResults.results[method] = { status: 'skipped' };
-                completed++;
-                globalCompleted++;
-                continue;
-              }
-
-              if (!isWsMethod && isWsEndpoint && category !== 'basic') {
-                // For WSS endpoints, only test basic methods and websocket category
-                endpointResults.results[method] = { status: 'skipped' };
-                completed++;
-                globalCompleted++;
-                continue;
-              }
-
               // Check if this is a batch method
               const batchSize = getBatchSize(method);
               let result: TestResult;
@@ -249,9 +230,7 @@ export async function runTests(
                 const actualMethod = getActualMethod(method);
                 let params: unknown[];
 
-                if (method.startsWith('eth_subscribe:')) {
-                  params = getSubscriptionParams(method);
-                } else if (FILTER_DEPENDENT_METHODS.includes(method)) {
+                if (FILTER_DEPENDENT_METHODS.includes(method)) {
                   // These methods need a valid filter ID - create fresh filter for each
                   const filterId = await createFilterId(endpoint.url, testSettings);
                   if (filterId) {

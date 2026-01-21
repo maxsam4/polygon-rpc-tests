@@ -16,14 +16,12 @@ export const categories: Category[] = [
   'debug',
   'trace',
   'txpool',
-  'websocket',
   'batch',
 ];
 
 // Determine which category a method belongs to (order matters - first match wins)
 export function getMethodCategory(method: string): Category {
   if (method.endsWith(':archive')) return 'archive';
-  if (method.startsWith('eth_subscribe:')) return 'websocket';
   // Batch methods check (before trace_ prefix check)
   if (method.startsWith('batch:') || method === 'trace_callMany') return 'batch';
   if (method.startsWith('bor_')) return 'bor';

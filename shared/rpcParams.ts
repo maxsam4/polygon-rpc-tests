@@ -24,35 +24,12 @@ export const BALANCE_OF_CALL_DATA = '0x70a08231000000000000000000000000000000000
 /**
  * Get the actual JSON-RPC method name from a test method identifier.
  * Handles archive method variants (e.g., "eth_getBalance:archive" -> "eth_getBalance")
- * and subscription variants (e.g., "eth_subscribe:newHeads" -> "eth_subscribe")
  */
 export function getActualMethod(method: string): string {
   if (method.endsWith(':archive')) {
     return method.replace(':archive', '');
   }
-  if (method.startsWith('eth_subscribe:')) {
-    return 'eth_subscribe';
-  }
   return method;
-}
-
-/**
- * Get subscription parameters for eth_subscribe methods.
- */
-export function getSubscriptionParams(method: string): unknown[] {
-  const subType = method.replace('eth_subscribe:', '');
-  switch (subType) {
-    case 'newHeads':
-      return ['newHeads'];
-    case 'logs':
-      return ['logs', { topics: [] }];
-    case 'newPendingTransactions':
-      return ['newPendingTransactions'];
-    case 'syncing':
-      return ['syncing'];
-    default:
-      return [subType];
-  }
 }
 
 /**
@@ -253,10 +230,6 @@ export function getMethodParams(
       return [];
     case 'txpool_status':
       return [];
-
-    // WebSocket subscription methods
-    case 'eth_subscribe':
-      return ['newHeads'];
 
     default:
       return [];

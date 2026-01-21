@@ -10,6 +10,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - When you add new methods, also add corresponding archive method targeting block 35m
 - For non archive methods which takes block or transaction as input, use the freshly fetched data while using hardcoded data for archive
 - commit changes after you're done
+- Update readme.md after changes
+- Update claude.md with notes you think will be helpful later or mistakes i corrected. Keep claude.md succinct.
 
 ## Project Overview
 
@@ -26,16 +28,8 @@ npm run dev
 # Run all tests against default RPC (polygon.drpc.org)
 npm test
 
-# Run tests against specific RPC endpoint
-RPC_URL="https://rpc.ankr.com/polygon" npm test
-
 # Run category-specific tests
-npm run test:basic     # web3_*, net_*, eth_blockNumber, etc.
-npm run test:state     # eth_getBalance, eth_call, etc.
-npm run test:archive   # Historical block tests (~block 35M)
-npm run test:bor       # Polygon/Bor consensus methods
-npm run test:trace     # trace_* methods
-npm run test:debug     # debug_trace* methods
+npm run test:basic     # eth_blockNumber, etc.
 
 # Build for production
 npm run build
@@ -51,7 +45,7 @@ npm install --legacy-peer-deps
 server/              Express backend (port 3000)
 ├── routes/          API endpoints (/api/results, /api/config, /api/tests/*)
 ├── services/
-│   ├── rpcClient.ts    HTTP + WebSocket RPC execution with timeout handling
+│   ├── rpcClient.ts    HTTP RPC execution with timeout handling
 │   ├── testRunner.ts   Test orchestration, concurrency, SSE broadcasting
 │   └── storage.ts      JSON file persistence (config.json, results.json)
 └── middleware/auth.ts  Bearer token authentication (ADMIN_PASSWORD env)
@@ -101,4 +95,3 @@ RPC_URL           # Default RPC for vitest tests (default: https://polygon.drpc.
 | debug | 9 | Debug tracing methods |
 | trace | 9 | trace_* methods |
 | txpool | 3 | Transaction pool inspection |
-| websocket | 4 | eth_subscribe methods |

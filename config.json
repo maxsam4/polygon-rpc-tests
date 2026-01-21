@@ -12,9 +12,6 @@
     { "url": "https://rpc-mainnet.matic.quiknode.pro", "name": "QuikNode" },
     { "url": "https://polygon-mainnet.gateway.tatum.io", "name": "Tatum" },
     { "url": "https://endpoints.omniatech.io/v1/matic/mainnet/public", "name": "Omnia" },
-    { "url": "wss://polygon.drpc.org", "name": "dRPC WSS" },
-    { "url": "wss://polygon-bor-rpc.publicnode.com", "name": "PublicNode WSS" },
-    { "url": "wss://polygon.gateway.tenderly.co", "name": "Tenderly WSS", "delayBetweenCallsMs": 200 },
     { "url": "https://poly.api.pocket.network", "name": "Pocket Network" }
   ],
   "testSettings": {
@@ -22,7 +19,7 @@
     "delayBetweenCallsMs": 100,
     "archiveBlockNumber": 35000000,
     "archiveTestAddress": "0x0000000000000000000000000000000000001010",
-    "concurrency": 10
+    "concurrency": 25
   },
   "methods": {
     "basic": [
@@ -137,12 +134,6 @@
       "txpool_content",
       "txpool_inspect",
       "txpool_status"
-    ],
-    "websocket": [
-      "eth_subscribe:newHeads",
-      "eth_subscribe:logs",
-      "eth_subscribe:newPendingTransactions",
-      "eth_subscribe:syncing"
     ],
     "batch": [
       "batch:1",

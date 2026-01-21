@@ -4,7 +4,7 @@ A comprehensive testing tool for Polygon RPC endpoints. Tests multiple public RP
 
 ## Features
 
-- **Comprehensive RPC Testing**: Tests 70+ JSON-RPC methods across 12 categories
+- **Comprehensive RPC Testing**: Tests 70+ JSON-RPC methods across 11 categories
 - **Multiple Endpoints**: Pre-configured with 21 public Polygon RPC providers
 - **Archive Node Detection**: Identifies archive vs full nodes via historical state queries
 - **Real-time Progress**: SSE-based live updates during test runs
@@ -69,7 +69,7 @@ polygon-rpc-tests/
 │   │   ├── config.ts         # GET/PUT /api/config (protected)
 │   │   └── tests.ts          # Test run endpoints + SSE
 │   └── services/
-│       ├── rpcClient.ts      # RPC call execution (HTTP + WebSocket)
+│       ├── rpcClient.ts      # RPC call execution
 │       ├── testRunner.ts     # Test orchestration
 │       └── storage.ts        # JSON file persistence
 ├── web/                       # Svelte frontend
@@ -119,7 +119,6 @@ polygon-rpc-tests/
 | **debug** | Debug methods | `debug_traceTransaction`, `debug_traceCall` |
 | **trace** | Trace methods | `trace_call`, `trace_block` |
 | **txpool** | Transaction pool | `txpool_content`, `txpool_status` |
-| **websocket** | Subscriptions | `eth_subscribe:newHeads`, `eth_subscribe:logs` |
 
 ## API Endpoints
 

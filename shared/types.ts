@@ -32,7 +32,6 @@ export interface MethodCategories {
   debug: string[];
   trace: string[];
   txpool: string[];
-  websocket: string[];
   batch: string[];
 }
 
