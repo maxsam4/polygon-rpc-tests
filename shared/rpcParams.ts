@@ -206,11 +206,12 @@ export function getMethodParams(
     case 'debug_accountRange':
       return [getBlockHash(), 0, '0x0000000000000000000000000000000000000000000000000000000000000000', 100];
     case 'debug_getModifiedAccountsByNumber':
-      // For archive, use archive block range; for latest, use recent blocks
+      // Requires actual block numbers, not 'latest' tag
       if (isArchive) {
         return [archiveBlockTag, archiveBlockTag];
       }
-      return [getBlockNumber(), getBlockNumber()];
+      if (!latestData?.blockNumber) throw new Error('latestData.blockNumber required for debug_getModifiedAccountsByNumber');
+      return [latestData.blockNumber, latestData.blockNumber];
     case 'debug_getModifiedAccountsByHash':
       return [getBlockHash(), getBlockHash()];
 
