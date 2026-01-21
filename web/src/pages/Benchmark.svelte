@@ -12,7 +12,6 @@
     resetBenchmark,
   } from '../stores/benchmark';
   import BenchmarkChart from '../components/BenchmarkChart.svelte';
-  import type { Config } from '../../../shared/types';
 
   let loading = true;
   let error: string | null = null;
@@ -22,41 +21,14 @@
 
   async function loadConfig() {
     try {
-      const res = await fetch('/api/results');
-      if (!res.ok) throw new Error('Failed to fetch config');
+      const res = await fetch('/api/benchmark/endpoints');
+      if (!res.ok) throw new Error('Failed to fetch endpoints');
 
-      // Fetch config from results endpoint to get endpoint list
-      const configRes = await fetch('/api/config', {
-        headers: { Authorization: 'Bearer ' },
-      });
-
-      // If config fetch fails (no auth), try to get endpoints from results
-      if (!configRes.ok) {
-        // Fallback: use hardcoded default endpoints
-        const defaultEndpoints = [
-          { url: 'https://polygon.drpc.org', name: 'dRPC public', showInBenchmark: true },
-          { url: 'https://polygon-bor-rpc.publicnode.com', name: 'PublicNode', showInBenchmark: true },
-          { url: 'https://polygon-rpc.com', name: 'Polygon-RPC', showInBenchmark: true },
-          { url: 'https://polygon.gateway.tenderly.co', name: 'Tenderly', showInBenchmark: true },
-          { url: 'https://polygon.lava.build', name: 'Lava', showInBenchmark: true },
-          { url: 'https://api.zan.top/polygon-mainnet', name: 'ZAN', showInBenchmark: true },
-          { url: 'https://polygon-public.nodies.app', name: 'Nodies', showInBenchmark: true },
-          { url: 'https://1rpc.io/matic', name: '1RPC', showInBenchmark: true },
-          { url: 'https://polygon.rpc.subquery.network/public', name: 'SubQuery', showInBenchmark: true },
-          { url: 'https://rpc-mainnet.matic.quiknode.pro', name: 'QuikNode', showInBenchmark: true },
-          { url: 'https://polygon-mainnet.gateway.tatum.io', name: 'Tatum', showInBenchmark: true },
-          { url: 'https://endpoints.omniatech.io/v1/matic/mainnet/public', name: 'Omnia', showInBenchmark: true },
-          { url: 'https://poly.api.pocket.network', name: 'Pocket Network', showInBenchmark: true },
-        ];
-        initializeEndpoints(defaultEndpoints);
-      } else {
-        const config: Config = await configRes.json();
-        initializeEndpoints(config.endpoints);
-      }
-
+      const data = await res.json();
+      initializeEndpoints(data.endpoints);
       loading = false;
     } catch (e) {
-      error = e instanceof Error ? e.message : 'Failed to load config';
+      error = e instanceof Error ? e.message : 'Failed to load endpoints';
       loading = false;
     }
   }

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import resultsRouter from './routes/results.js';
 import configRouter from './routes/config.js';
 import testsRouter from './routes/tests.js';
+import benchmarkRouter from './routes/benchmark.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use('/api/results', resultsRouter);
 app.use('/api/config', configRouter);
 app.use('/api/tests', testsRouter);
+app.use('/api/benchmark', benchmarkRouter);
 
 // Serve static files in production
 const staticPath = path.join(__dirname, '../web/dist');
