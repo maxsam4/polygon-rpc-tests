@@ -159,7 +159,8 @@ export function getMethodParams(
     case 'bor_getRootHash':
       return [0, 100];
     case 'bor_getSignersAtHash':
-      return [getBlockHash()];
+      // Use known block hash to avoid "no producers found for block num" on recent blocks
+      return [KNOWN_BLOCK_HASH];
     case 'bor_getSnapshotAtHash':
       return [getBlockHash()];
 
