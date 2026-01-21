@@ -9,6 +9,7 @@ A comprehensive testing tool for Polygon RPC endpoints. Tests multiple public RP
 - **Archive Node Detection**: Identifies archive vs full nodes via historical state queries
 - **Real-time Progress**: SSE-based live updates during test runs
 - **Interactive UI**: Svelte-based web interface with filtering and sorting
+- **Live Benchmark**: Real-time RPC performance comparison with charts
 - **Independent Tests**: Vitest-based test suite for CI/CD integration
 - **Configurable**: JSON-based configuration for endpoints and test parameters
 
@@ -77,11 +78,14 @@ polygon-rpc-tests/
 │       ├── pages/
 │       │   ├── Results.svelte    # Main results table
 │       │   ├── Endpoint.svelte   # Endpoint detail view
-│       │   └── Admin.svelte      # Admin panel
+│       │   ├── Admin.svelte      # Admin panel
+│       │   └── Benchmark.svelte  # Live benchmark page
 │       ├── components/
-│       │   └── StatusBadge.svelte
+│       │   ├── StatusBadge.svelte
+│       │   └── BenchmarkChart.svelte  # Chart.js wrapper
 │       ├── stores/
-│       │   └── results.ts    # Svelte stores
+│       │   ├── results.ts    # Svelte stores
+│       │   └── benchmark.ts  # Benchmark polling state
 │       └── lib/
 │           └── api.ts        # API client
 ├── tests/                     # Vitest test suite
@@ -119,6 +123,18 @@ polygon-rpc-tests/
 | **debug** | Debug methods | `debug_traceTransaction`, `debug_traceCall` |
 | **trace** | Trace methods | `trace_call`, `trace_block` |
 | **txpool** | Transaction pool | `txpool_content`, `txpool_status` |
+
+## Benchmark Page
+
+The `/benchmark` page provides real-time performance comparison of RPC endpoints:
+
+- **Live Polling**: Calls `eth_blockNumber` on all endpoints at configurable intervals (default: 1s)
+- **Block Number Chart**: Shows which endpoints are returning the latest blocks
+- **Response Time Chart**: Visualizes latency across all endpoints
+- **Reliability Metrics**: Tracks success rate over time
+- **Temporary Endpoints**: Add custom RPC URLs for comparison
+
+Navigate to `http://localhost:5173/#/benchmark` to access the benchmark page.
 
 ## API Endpoints
 

@@ -11,6 +11,7 @@ export interface Endpoint {
   name: string;
   delayBetweenCallsMs?: number;  // Optional per-endpoint override
   sensitive?: boolean;  // If true, URL is hidden in UI and API responses
+  showInBenchmark?: boolean;  // If true, endpoint appears in benchmark page
 }
 
 export interface TestSettings {
@@ -80,3 +81,36 @@ export interface ProgressEvent {
 }
 
 export type Category = keyof MethodCategories;
+
+// Benchmark types
+export interface BenchmarkDataPoint {
+  timestamp: number;
+  blockNumber: number | null;
+  responseMs: number | null;
+  success: boolean;
+}
+
+export interface BenchmarkEndpointData {
+  id: string;
+  url: string;
+  name: string;
+  sensitive?: boolean;
+  isTemporary?: boolean;
+  history: BenchmarkDataPoint[];
+  totalCalls: number;
+  successfulCalls: number;
+}
+
+export interface BenchmarkState {
+  endpoints: Record<string, BenchmarkEndpointData>;
+  pollingIntervalMs: number;
+  maxDataPoints: number;
+  isRunning: boolean;
+}
+
+export interface BenchmarkEvent {
+  type: 'init' | 'update' | 'endpoint_added' | 'endpoint_removed' | 'stopped';
+  state?: BenchmarkState;
+  endpointId?: string;
+  dataPoint?: BenchmarkDataPoint;
+}

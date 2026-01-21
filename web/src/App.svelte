@@ -3,11 +3,13 @@
   import Results from './pages/Results.svelte';
   import Endpoint from './pages/Endpoint.svelte';
   import Admin from './pages/Admin.svelte';
+  import Benchmark from './pages/Benchmark.svelte';
 
   const routes = {
     '/': Results,
     '/endpoint/:id': Endpoint,
     '/admin': Admin,
+    '/benchmark': Benchmark,
   };
 </script>
 
@@ -16,6 +18,7 @@
     <h1><a href="#/">Polygon RPC Tester</a></h1>
     <nav>
       <a href="#/">Results</a>
+      <a href="#/benchmark">Benchmark</a>
       <a href="#/admin">Admin</a>
     </nav>
   </header>
