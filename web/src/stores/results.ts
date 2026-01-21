@@ -23,12 +23,12 @@ export const categories: Category[] = [
 export function getMethodCategory(method: string): Category {
   // Batch methods check (before trace_ prefix check)
   if (method.startsWith('batch:') || method === 'trace_callMany') return 'batch';
-  // debug/trace/bor categories include both latest and archive variants
+  // debug/trace categories include both latest and archive variants
   if (method.startsWith('debug_')) return 'debug';
   if (method.startsWith('trace_')) return 'trace';
-  if (method.startsWith('bor_')) return 'bor';
-  // Archive category for eth_* archive methods only
+  // Archive category for eth_* and bor_* archive methods
   if (method.endsWith(':archive')) return 'archive';
+  if (method.startsWith('bor_')) return 'bor';
   if (method.startsWith('txpool_')) return 'txpool';
   if (method.includes('Filter') || method === 'eth_getLogs') return 'filter';
   if (method.includes('Transaction') && !method.includes('Count')) return 'transaction';

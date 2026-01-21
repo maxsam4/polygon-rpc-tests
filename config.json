@@ -89,15 +89,15 @@
       "eth_getTransactionByHash:archive",
       "eth_getTransactionByBlockHashAndIndex:archive",
       "eth_getTransactionByBlockNumberAndIndex:archive",
-      "eth_getTransactionReceipt:archive"
+      "eth_getTransactionReceipt:archive",
+      "bor_getSignersAtHash:archive"
     ],
     "bor": [
       "bor_getAuthor",
       "bor_getCurrentValidators",
       "bor_getCurrentProposer",
       "bor_getRootHash",
-      "bor_getSignersAtHash",
-      "bor_getSignersAtHash:archive"
+      "bor_getSignersAtHash"
     ],
     "debug": [
       "debug_traceTransaction",
