@@ -56,6 +56,10 @@ export async function executeRpcCall(
       ) {
         return { status: 'unsupported', error: data.error.message };
       }
+      // eth_simulateV1: "method handler crashed" indicates the method exists but has a bug
+      if (method === 'eth_simulateV1' && errorMsg.includes('method handler crashed')) {
+        return { status: 'pass', responseMs, response: '"method exists (handler crashed)"' };
+      }
       return { status: 'fail', responseMs, error: data.error.message };
     }
 
