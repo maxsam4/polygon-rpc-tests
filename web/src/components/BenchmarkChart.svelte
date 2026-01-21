@@ -13,12 +13,22 @@
   let canvas: HTMLCanvasElement;
   let chart: Chart | null = null;
 
-  // Generate distinct colors for endpoints
+  // Mission control themed colors - cyan/teal variants with high contrast
   function getColor(index: number): string {
     const colors = [
-      '#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#8b5cf6',
-      '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16',
-      '#06b6d4', '#a855f7', '#10b981',
+      '#00b4d8', // Primary cyan
+      '#00ff88', // Nominal green
+      '#ff3366', // Critical pink
+      '#ffc107', // Warning amber
+      '#48cae4', // Light cyan
+      '#a855f7', // Purple
+      '#14b8a6', // Teal
+      '#f97316', // Orange
+      '#ec4899', // Pink
+      '#8b5cf6', // Violet
+      '#06b6d4', // Cyan variant
+      '#22c55e', // Green variant
+      '#eab308', // Yellow
     ];
     return colors[index % colors.length];
   }
@@ -49,14 +59,20 @@
         return point[dataKey];
       });
 
+      const color = getColor(index);
+
       return {
         label: endpoint.name,
         data,
-        borderColor: getColor(index),
-        backgroundColor: getColor(index) + '20',
+        borderColor: color,
+        backgroundColor: color + '20',
         borderWidth: 2,
         pointRadius: 0,
-        tension: 0.1,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: color,
+        pointHoverBorderColor: '#e0f7fa',
+        pointHoverBorderWidth: 2,
+        tension: 0.2,
         spanGaps: true,
       };
     });
@@ -83,29 +99,110 @@
         },
         plugins: {
           title: {
-            display: true,
+            display: !!title,
             text: title,
+            color: '#90a4ae',
+            font: {
+              family: "'Orbitron', sans-serif",
+              size: 12,
+              weight: 600,
+            },
+            padding: { bottom: 16 },
           },
           legend: {
             display: true,
             position: 'bottom',
             labels: {
               boxWidth: 12,
-              padding: 8,
-              font: { size: 10 },
+              boxHeight: 2,
+              padding: 12,
+              color: '#90a4ae',
+              font: {
+                family: "'JetBrains Mono', monospace",
+                size: 10,
+              },
+              usePointStyle: false,
             },
+          },
+          tooltip: {
+            backgroundColor: '#0c1624',
+            titleColor: '#e0f7fa',
+            bodyColor: '#90a4ae',
+            borderColor: '#1a2d42',
+            borderWidth: 1,
+            padding: 12,
+            titleFont: {
+              family: "'Space Grotesk', sans-serif",
+              size: 12,
+              weight: 600,
+            },
+            bodyFont: {
+              family: "'JetBrains Mono', monospace",
+              size: 11,
+            },
+            displayColors: true,
+            boxWidth: 8,
+            boxHeight: 8,
+            boxPadding: 4,
+            cornerRadius: 2,
           },
         },
         scales: {
           x: {
             display: true,
-            title: { display: true, text: 'Time' },
-            ticks: { maxTicksLimit: 10 },
+            title: {
+              display: true,
+              text: 'Time',
+              color: '#546e7a',
+              font: {
+                family: "'Orbitron', sans-serif",
+                size: 10,
+                weight: 600,
+              },
+            },
+            ticks: {
+              maxTicksLimit: 8,
+              color: '#546e7a',
+              font: {
+                family: "'JetBrains Mono', monospace",
+                size: 9,
+              },
+            },
+            grid: {
+              color: 'rgba(0, 180, 216, 0.08)',
+              lineWidth: 1,
+            },
+            border: {
+              color: '#1a2d42',
+            },
           },
           y: {
             display: true,
-            title: { display: true, text: yAxisLabel },
+            title: {
+              display: true,
+              text: yAxisLabel,
+              color: '#546e7a',
+              font: {
+                family: "'Orbitron', sans-serif",
+                size: 10,
+                weight: 600,
+              },
+            },
             beginAtZero: dataKey === 'responseMs',
+            ticks: {
+              color: '#546e7a',
+              font: {
+                family: "'JetBrains Mono', monospace",
+                size: 9,
+              },
+            },
+            grid: {
+              color: 'rgba(0, 180, 216, 0.08)',
+              lineWidth: 1,
+            },
+            border: {
+              color: '#1a2d42',
+            },
           },
         },
       },
@@ -133,7 +230,7 @@
 <style>
   .chart-container {
     position: relative;
-    height: 300px;
+    height: 280px;
     width: 100%;
   }
 </style>

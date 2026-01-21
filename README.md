@@ -208,11 +208,19 @@ The tool comes with 21 pre-configured public Polygon RPC endpoints:
 
 ## Test Result States
 
-| Status | Icon | Description |
-|--------|------|-------------|
-| Pass | ✅ | Method works, response valid |
-| Fail | ❌ | Method exists but returned error |
-| Timeout | ⚠️ | No response within threshold |
-| Unsupported | 🚫 | Method not implemented |
-| Skipped | ⏭️ | Depends on failed prerequisite |
+| Status | Description |
+|--------|-------------|
+| PASS | Method works, response valid |
+| FAIL | Method exists but returned error |
+| TIMEOUT | No response within threshold |
+| N/A | Method not implemented |
+| SKIP | Depends on failed prerequisite |
+
+## UI Design
+
+The web interface features a "Mission Control / Data Observatory" aesthetic:
+
+- **Typography**: Orbitron (display), Space Grotesk (body), JetBrains Mono (data)
+- **Theme**: Dark tactical theme with cyan accents and grid overlay
+- **Visual Elements**: Corner brackets, animated status dots, glow effects
 
