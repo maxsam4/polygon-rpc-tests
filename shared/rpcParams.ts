@@ -214,8 +214,12 @@ export function getMethodParams(
       return [getTxHash(), ['trace']];
     case 'trace_block':
       return [getBlockNumber()];
-    case 'trace_filter':
-      return [{ fromBlock: getBlockNumber(), toBlock: getBlockNumber() }];
+    case 'trace_filter': {
+      // trace_filter expects decimal block numbers, not hex strings
+      const blockHex = getBlockNumber();
+      const blockDecimal = parseInt(blockHex, 16);
+      return [{ fromBlock: blockDecimal, toBlock: blockDecimal }];
+    }
     case 'trace_get':
       return [getTxHash(), ['0x0']];
     case 'trace_transaction':
