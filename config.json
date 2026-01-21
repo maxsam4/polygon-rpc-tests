@@ -89,18 +89,7 @@
       "eth_getTransactionByHash:archive",
       "eth_getTransactionByBlockHashAndIndex:archive",
       "eth_getTransactionByBlockNumberAndIndex:archive",
-      "eth_getTransactionReceipt:archive",
-      "debug_traceTransaction:archive",
-      "debug_traceBlockByNumber:archive",
-      "debug_traceBlockByHash:archive",
-      "debug_storageRangeAt:archive",
-      "debug_getModifiedAccountsByNumber:archive",
-      "debug_getModifiedAccountsByHash:archive",
-      "trace_replayBlockTransactions:archive",
-      "trace_replayTransaction:archive",
-      "trace_block:archive",
-      "trace_get:archive",
-      "trace_transaction:archive"
+      "eth_getTransactionReceipt:archive"
     ],
     "bor": [
       "bor_getAuthor",
@@ -118,7 +107,13 @@
       "debug_getBadBlocks",
       "debug_accountRange",
       "debug_getModifiedAccountsByNumber",
-      "debug_getModifiedAccountsByHash"
+      "debug_getModifiedAccountsByHash",
+      "debug_traceTransaction:archive",
+      "debug_traceBlockByNumber:archive",
+      "debug_traceBlockByHash:archive",
+      "debug_storageRangeAt:archive",
+      "debug_getModifiedAccountsByNumber:archive",
+      "debug_getModifiedAccountsByHash:archive"
     ],
     "trace": [
       "trace_call",
@@ -128,7 +123,12 @@
       "trace_block",
       "trace_filter",
       "trace_get",
-      "trace_transaction"
+      "trace_transaction",
+      "trace_replayBlockTransactions:archive",
+      "trace_replayTransaction:archive",
+      "trace_block:archive",
+      "trace_get:archive",
+      "trace_transaction:archive"
     ],
     "txpool": [
       "txpool_content",
