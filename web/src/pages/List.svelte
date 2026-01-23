@@ -10,7 +10,7 @@
 
   async function loadProviders() {
     try {
-      const res = await fetch('/api/config');
+      const res = await fetch('/api/benchmark/endpoints');
       if (!res.ok) throw new Error('Failed to fetch providers');
 
       const data = await res.json();
