@@ -53,7 +53,9 @@
   }
 
   $: if ($results && params.id) {
-    endpoint = $results.endpoints[params.id] || null;
+    // Decode the URL-encoded params.id to match the keys in results.endpoints
+    const decodedId = decodeURIComponent(params.id);
+    endpoint = $results.endpoints[decodedId] || null;
   }
 
   $: methodEntries = endpoint
@@ -98,9 +100,9 @@
 </script>
 
 <div class="endpoint-page">
-  <a href="/" use:link class="back-link">
+  <a href="/#/features" use:link class="back-link">
     <span class="back-icon">←</span>
-    <span>Back to Matrix</span>
+    <span>Back to Features</span>
   </a>
 
   {#if $loading}
