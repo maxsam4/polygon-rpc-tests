@@ -9,7 +9,8 @@ export interface LatestData {
 
 export interface Endpoint {
   url: string;
-  name: string;
+  name: string;  // Endpoint name shown in features/latency pages
+  providerName?: string;  // Provider name shown in providers list page (defaults to name if not specified)
   homepage?: string;  // Provider's website homepage
   delayBetweenCallsMs?: number;  // Optional per-endpoint override
   sensitive?: boolean;  // If true, URL is hidden in UI and API responses

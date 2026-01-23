@@ -42,6 +42,11 @@
     return `https://${extractDomain(provider.url)}`;
   }
 
+  function getProviderDisplayName(provider: Endpoint): string {
+    // Use providerName if available, otherwise fall back to name
+    return provider.providerName || provider.name;
+  }
+
   function getProviderInitials(name: string): string {
     const words = name.split(' ').filter(w => w.length > 0);
     if (words.length === 1) {
@@ -88,6 +93,7 @@
 
   $: filteredProviders = providers.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.providerName && p.providerName.toLowerCase().includes(searchQuery.toLowerCase())) ||
     p.url.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -147,11 +153,11 @@
             <div class="corner-br"></div>
 
             <div class="card-header">
-              <div class="provider-logo" style="--logo-color: {getProviderColor(provider.name)}">
-                <span class="logo-text">{getProviderInitials(provider.name)}</span>
+              <div class="provider-logo" style="--logo-color: {getProviderColor(getProviderDisplayName(provider))}">
+                <span class="logo-text">{getProviderInitials(getProviderDisplayName(provider))}</span>
               </div>
               <div class="provider-info">
-                <h3 class="provider-name">{provider.name}</h3>
+                <h3 class="provider-name">{getProviderDisplayName(provider)}</h3>
                 <button
                   class="website-link"
                   on:click={(e) => navigateToWebsite(provider, e)}
