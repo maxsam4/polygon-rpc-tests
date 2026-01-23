@@ -1,12 +1,14 @@
 <script lang="ts">
   import Router from 'svelte-spa-router';
+  import List from './pages/List.svelte';
   import Results from './pages/Results.svelte';
   import Endpoint from './pages/Endpoint.svelte';
   import Admin from './pages/Admin.svelte';
   import Benchmark from './pages/Benchmark.svelte';
 
   const routes = {
-    '/': Results,
+    '/': List,
+    '/results': Results,
     '/endpoint/:id': Endpoint,
     '/admin': Admin,
     '/benchmark': Benchmark,
@@ -39,6 +41,10 @@
 
       <nav>
         <a href="#/" class="nav-btn" class:active={currentPath === '/'}>
+          <span class="nav-indicator"></span>
+          <span class="nav-label">Providers</span>
+        </a>
+        <a href="#/results" class="nav-btn" class:active={currentPath === '/results'}>
           <span class="nav-indicator"></span>
           <span class="nav-label">Results</span>
         </a>
