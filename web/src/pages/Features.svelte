@@ -85,7 +85,7 @@
 <div class="results-page">
   <div class="page-header">
     <div class="header-left">
-      <h2 class="section-title">Endpoint Status Matrix</h2>
+      <h2 class="section-title">RPC provider endpoint support summary</h2>
       {#if $results?.lastRun}
         <span class="timestamp">
           <span class="label">Last Scan:</span>
@@ -96,6 +96,28 @@
     <div class="endpoint-count">
       <span class="count-value">{filteredData.length}</span>
       <span class="count-label">Endpoints</span>
+    </div>
+  </div>
+
+  <div class="disclaimer tactical-panel">
+    <div class="corner-tl"></div>
+    <div class="corner-tr"></div>
+    <div class="disclaimer-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 4.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="8" cy="11" r="0.5" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="disclaimer-content">
+      <p class="disclaimer-item">
+        <span class="bullet">›</span>
+        <span class="text">Results reflect free/public endpoint capabilities only. Many providers offer enhanced features and higher rate limits in their paid tiers.</span>
+      </p>
+      <p class="disclaimer-item">
+        <span class="bullet">›</span>
+        <span class="text">Tests execute one request per second per endpoint. Some failures may indicate rate limiting rather than missing functionality.</span>
+      </p>
     </div>
   </div>
 
@@ -260,6 +282,74 @@
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--text-muted);
+  }
+
+  .disclaimer {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    background-color: rgba(0, 180, 216, 0.03);
+    border: 1px solid rgba(0, 180, 216, 0.2);
+    border-radius: 2px;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  .disclaimer-icon {
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+    opacity: 0.8;
+  }
+
+  .disclaimer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+  }
+
+  .disclaimer-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .disclaimer-item .bullet {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .disclaimer-item .text {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  .corner-tl,
+  .corner-tr {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-style: solid;
+    border-color: var(--accent);
+  }
+
+  .corner-tl {
+    top: -1px;
+    left: -1px;
+    border-width: 2px 0 0 2px;
+  }
+
+  .corner-tr {
+    top: -1px;
+    right: -1px;
+    border-width: 2px 2px 0 0;
   }
 
   .controls {
