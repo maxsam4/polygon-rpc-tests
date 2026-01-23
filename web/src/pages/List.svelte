@@ -103,29 +103,57 @@
       return;
     }
 
+    const chainId = '0x89'; // Polygon Mainnet chain ID (137)
+
     try {
+      // Try to switch to the network first
       await window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [{
-          chainId: '0x89', // Polygon Mainnet chain ID (137)
-          chainName: `Polygon Mainnet (${getProviderDisplayName(provider)})`,
-          nativeCurrency: {
-            name: 'MATIC',
-            symbol: 'MATIC',
-            decimals: 18
-          },
-          rpcUrls: [provider.url],
-          blockExplorerUrls: ['https://polygonscan.com']
-        }]
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId }],
       });
-    } catch (err: unknown) {
-      console.error('Failed to add network:', err);
-      // Check if user rejected the request (error code 4001)
-      if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: number }).code === 4001) {
-        // User rejected the request
-        return;
+
+      // If successful, show success message
+      alert(`Switched to Polygon Mainnet!\n\nNote: To use ${getProviderDisplayName(provider)}'s RPC, you need to manually add it in your wallet's network settings:\n${provider.url}`);
+    } catch (switchError: unknown) {
+      // If the network doesn't exist (error code 4902), try to add it
+      if (typeof switchError === 'object' && switchError !== null && 'code' in switchError) {
+        const errorCode = (switchError as { code: number }).code;
+
+        if (errorCode === 4902) {
+          // Network doesn't exist, try to add it
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId,
+                chainName: `Polygon Mainnet (${getProviderDisplayName(provider)})`,
+                nativeCurrency: {
+                  name: 'MATIC',
+                  symbol: 'MATIC',
+                  decimals: 18
+                },
+                rpcUrls: [provider.url],
+                blockExplorerUrls: ['https://polygonscan.com']
+              }]
+            });
+            // Successfully added
+            alert(`Successfully added ${getProviderDisplayName(provider)} RPC to your wallet!`);
+          } catch (addError: unknown) {
+            console.error('Failed to add network:', addError);
+            // Check if user rejected
+            if (typeof addError === 'object' && addError !== null && 'code' in addError && (addError as { code: number }).code === 4001) {
+              return; // User rejected, don't show error
+            }
+            alert('Failed to add network to wallet. Please check your wallet and try again.');
+          }
+        } else if (errorCode === 4001) {
+          // User rejected the request
+          return;
+        } else {
+          console.error('Failed to switch network:', switchError);
+          alert(`Error switching network. Code: ${errorCode}\nPlease try adding the RPC manually in your wallet settings.`);
+        }
       }
-      alert('Failed to add network to wallet. Please try again.');
     }
   }
 
