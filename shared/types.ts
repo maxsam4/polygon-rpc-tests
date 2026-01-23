@@ -39,15 +39,10 @@ export interface MethodCategories {
   batch: string[];
 }
 
-export interface PageSettings {
-  providersPageTitle?: string;  // Custom title for providers page (default: "RPC Providers")
-}
-
 export interface Config {
   endpoints: Endpoint[];
   testSettings: TestSettings;
   methods: MethodCategories;
-  pageSettings?: PageSettings;
 }
 
 export interface TestResult {

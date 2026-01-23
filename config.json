@@ -17,15 +17,12 @@
     { "url": "https://137.rpc.thirdweb.com/", "name": "ThirdWeb public", "homepage": "https://thirdweb.com", "showInBenchmark": true },
     { "url": "https://poly.api.pocket.network", "name": "Pocket Network public", "homepage": "https://pokt.network", "showInBenchmark": true }
   ],
-  "pageSettings": {
-    "providersPageTitle": "RPC Providers"
-  },
   "testSettings": {
     "timeoutMs": 10000,
     "delayBetweenCallsMs": 1000,
     "archiveBlockNumber": 35000000,
     "archiveTestAddress": "0x0000000000000000000000000000000000001010",
-    "concurrency": 25
+    "concurrency": 15
   },
   "methods": {
     "basic": [

@@ -3,7 +3,6 @@
   import type { Endpoint } from '../../../shared/types';
 
   let providers: Endpoint[] = [];
-  let pageTitle = 'RPC Providers';
   let loading = true;
   let error: string | null = null;
   let searchQuery = '';
@@ -17,11 +16,6 @@
       const data = await res.json();
       // Filter by showInProviders (default to true if not specified)
       providers = (data.endpoints || []).filter((p: Endpoint) => p.showInProviders !== false);
-
-      // Load page title if available
-      if (data.pageSettings?.providersPageTitle) {
-        pageTitle = data.pageSettings.providersPageTitle;
-      }
 
       loading = false;
     } catch (e) {
@@ -107,7 +101,7 @@
 <div class="list-page">
   <div class="page-header">
     <div class="header-content">
-      <h2 class="section-title">{pageTitle}</h2>
+      <h2 class="section-title">RPC Providers</h2>
       {#if !loading}
         <div class="provider-count" class:pulse={providerCount > 0}>
           <span class="count-number">{providerCount}</span>
