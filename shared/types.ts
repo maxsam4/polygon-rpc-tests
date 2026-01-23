@@ -3,6 +3,7 @@ export type TestStatus = 'pass' | 'fail' | 'timeout' | 'unsupported' | 'skipped'
 export interface LatestData {
   blockNumber: string;  // Hex string
   blockHash: string;    // 32-byte hex
+  prevBlockHash: string;  // 32-byte hex - hash of block before blockNumber
   txHash: string;       // 32-byte hex
 }
 

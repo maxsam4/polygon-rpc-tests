@@ -163,6 +163,15 @@ export async function collectLatestData(
 
     const block = blockResponse.result as { hash: string; transactions: Array<{ hash: string }> };
     const blockHash = block.hash;
+
+    // Get previous block hash
+    const prevBlockNum = targetNum - 1;
+    const prevBlockHex = `0x${prevBlockNum.toString(16)}`;
+    const prevBlockResponse = await callRpc(url, 'eth_getBlockByNumber', [prevBlockHex, false], timeoutMs);
+    if (!prevBlockResponse.result) return null;
+    const prevBlock = prevBlockResponse.result as { hash: string };
+    const prevBlockHash = prevBlock.hash;
+
     let txHash: string | null = null;
 
     // Try to find a transaction in this block or search recent blocks
@@ -186,6 +195,7 @@ export async function collectLatestData(
     return {
       blockNumber: targetBlockHex,
       blockHash,
+      prevBlockHash,
       txHash,
     };
   } catch {

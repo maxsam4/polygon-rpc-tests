@@ -117,6 +117,27 @@ async function collectLatestData(
 
     const block = blockData.result;
     const blockHash = block.hash;
+
+    // Get previous block hash
+    const prevBlockNum = targetNum - 1;
+    const prevBlockHex = `0x${prevBlockNum.toString(16)}`;
+    const prevBlockResponse = await fetch(endpointUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 10,
+        method: 'eth_getBlockByNumber',
+        params: [prevBlockHex, false],
+      }),
+      signal: controller.signal,
+    });
+    const prevBlockData = await prevBlockResponse.json();
+    if (!prevBlockData.result) {
+      throw new Error('Failed to get previous block data from endpoint');
+    }
+    const prevBlockHash = prevBlockData.result.hash;
+
     let txHash: string | null = null;
 
     // Try to find a transaction in this block or search recent blocks
@@ -152,6 +173,7 @@ async function collectLatestData(
     return {
       blockNumber: targetBlockHex,
       blockHash,
+      prevBlockHash,
       txHash,
     };
   } finally {

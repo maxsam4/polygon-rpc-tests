@@ -3,6 +3,9 @@ import type { TestSettings, LatestData } from './types.js';
 // Known valid block hash from Polygon mainnet (block 35,000,000)
 export const KNOWN_BLOCK_HASH = '0x7ea975390c67cd9c4c2d8295063b2ca9938c5a43582eb477541af73bbf6f878e';
 
+// Known valid previous block hash from Polygon mainnet (block 34,999,999)
+export const KNOWN_PREV_BLOCK_HASH = '0x12c3665313591e0f2e80b0c115002c9b4a5a943b70ca8aa6476fc542fc849d4a';
+
 // Known valid transaction hash from Polygon mainnet (from block 35,000,000)
 export const KNOWN_TX_HASH = '0xcbd124780ce7d6801bc9cb588b6a4aff4669761baf0337e5dd45392fa039c609';
 
@@ -58,6 +61,9 @@ export function getMethodParams(
 
   // Helper to get block hash - archive uses block 35M, latest uses current - 10 blocks
   const getBlockHash = () => isArchive ? KNOWN_BLOCK_HASH : latestData!.blockHash;
+
+  // Helper to get previous block hash - archive uses block 35M-1, latest uses current - 11 blocks
+  const getPrevBlockHash = () => isArchive ? KNOWN_PREV_BLOCK_HASH : latestData!.prevBlockHash;
 
   // Helper to get block number - archive uses block 35M, latest uses current - 10 blocks
   const getBlockNumber = () => isArchive ? archiveBlockTag : latestData!.blockNumber;
@@ -199,7 +205,7 @@ export function getMethodParams(
       // Requires actual block numbers, not 'latest' tag
       return [getBlockNumber(), getBlockNumber()];
     case 'debug_getModifiedAccountsByHash':
-      return [getBlockHash(), getBlockHash()];
+      return [getPrevBlockHash(), getBlockHash()];
 
     // Trace methods
     case 'trace_call':
@@ -218,7 +224,7 @@ export function getMethodParams(
       // trace_filter expects decimal block numbers, not hex strings
       const blockHex = getBlockNumber();
       const blockDecimal = parseInt(blockHex, 16);
-      return [{ fromBlock: blockDecimal, toBlock: blockDecimal }];
+      return [{ fromBlock: blockDecimal, toBlock: blockDecimal, fromAddress: ["0xEdC763b3e418cD14767b3Be02b667619a6374076"] }];
     }
     case 'trace_get':
       return [getTxHash(), ['0x0']];
