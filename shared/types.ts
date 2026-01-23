@@ -104,6 +104,7 @@ export interface BenchmarkEndpointData {
 
 export interface BenchmarkState {
   endpoints: Record<string, BenchmarkEndpointData>;
+  colorMap: Record<string, string>; // Maps endpoint ID to color
   pollingIntervalMs: number;
   maxDataPoints: number;
   isRunning: boolean;

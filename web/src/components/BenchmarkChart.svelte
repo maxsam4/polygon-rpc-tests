@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { Chart, registerables } from 'chart.js';
   import type { BenchmarkEndpointData } from '../../../shared/types';
+  import { benchmarkState } from '../stores/benchmark';
 
   Chart.register(...registerables);
 
@@ -12,26 +13,6 @@
 
   let canvas: HTMLCanvasElement;
   let chart: Chart | null = null;
-
-  // Mission control themed colors - cyan/teal variants with high contrast
-  function getColor(index: number): string {
-    const colors = [
-      '#00b4d8', // Primary cyan
-      '#00ff88', // Nominal green
-      '#ff3366', // Critical pink
-      '#ffc107', // Warning amber
-      '#48cae4', // Light cyan
-      '#a855f7', // Purple
-      '#14b8a6', // Teal
-      '#f97316', // Orange
-      '#ec4899', // Pink
-      '#8b5cf6', // Violet
-      '#06b6d4', // Cyan variant
-      '#22c55e', // Green variant
-      '#eab308', // Yellow
-    ];
-    return colors[index % colors.length];
-  }
 
   function updateChart() {
     if (!chart) return;
@@ -52,14 +33,15 @@
     });
 
     // Create datasets
-    const datasets = endpoints.map((endpoint, index) => {
+    const datasets = endpoints.map((endpoint) => {
       const data = timestamps.map((t) => {
         const point = endpoint.history.find((p) => p.timestamp === t);
         if (!point) return null;
         return point[dataKey];
       });
 
-      const color = getColor(index);
+      // Get stable color from colorMap
+      const color = $benchmarkState.colorMap[endpoint.id] || '#00b4d8';
 
       return {
         label: endpoint.name,

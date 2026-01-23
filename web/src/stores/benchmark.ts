@@ -6,9 +6,27 @@ import type {
   Endpoint,
 } from '../../../shared/types';
 
+// Mission control themed colors - cyan/teal variants with high contrast
+const chartColors = [
+  '#00b4d8', // Primary cyan
+  '#00ff88', // Nominal green
+  '#ff3366', // Critical pink
+  '#ffc107', // Warning amber
+  '#48cae4', // Light cyan
+  '#a855f7', // Purple
+  '#14b8a6', // Teal
+  '#f97316', // Orange
+  '#ec4899', // Pink
+  '#8b5cf6', // Violet
+  '#06b6d4', // Cyan variant
+  '#22c55e', // Green variant
+  '#eab308', // Yellow
+];
+
 // Default state
 const defaultState: BenchmarkState = {
   endpoints: {},
+  colorMap: {},
   pollingIntervalMs: 2000,
   maxDataPoints: 60,
   isRunning: false,
@@ -49,6 +67,17 @@ function generateEndpointId(url: string): string {
     hash = hash & hash;
   }
   return Math.abs(hash).toString(36);
+}
+
+// Assign a color to an endpoint based on the number of existing colors
+function assignColor(state: BenchmarkState, endpointId: string): string {
+  if (state.colorMap[endpointId]) {
+    return state.colorMap[endpointId];
+  }
+  const colorIndex = Object.keys(state.colorMap).length;
+  const color = chartColors[colorIndex % chartColors.length];
+  state.colorMap[endpointId] = color;
+  return color;
 }
 
 // Fetch block number from an RPC endpoint
@@ -144,6 +173,7 @@ export function initializeEndpoints(endpoints: Endpoint[]): void {
       if (endpoint.showInBenchmark !== false) {
         const id = generateEndpointId(endpoint.url);
         if (!state.endpoints[id]) {
+          assignColor(state, id); // Assign color when adding endpoint
           state.endpoints[id] = {
             id,
             url: endpoint.url,
@@ -195,6 +225,7 @@ export function addTemporaryEndpoint(url: string, name: string): boolean {
   }
 
   benchmarkState.update((s) => {
+    assignColor(s, id); // Assign color when adding endpoint
     s.endpoints[id] = {
       id,
       url,
@@ -221,6 +252,7 @@ export function removeTemporaryEndpoint(id: string): boolean {
 
   benchmarkState.update((s) => {
     delete s.endpoints[id];
+    delete s.colorMap[id]; // Remove color mapping when removing endpoint
     return s;
   });
 
