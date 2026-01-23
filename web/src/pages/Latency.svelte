@@ -19,7 +19,7 @@
   let error: string | null = null;
   let newEndpointUrl = '';
   let newEndpointName = '';
-  let intervalInput = 1000;
+  let intervalInput = 2000;
 
   type SortColumn = 'name' | 'block' | 'min' | 'p50' | 'p95' | 'max' | 'reliability';
   let sortColumn: SortColumn = 'p50';

@@ -230,10 +230,6 @@
             </div>
 
             <div class="card-footer">
-              <div class="status-indicator">
-                <span class="status-dot active"></span>
-                <span class="status-text">Online</span>
-              </div>
               <a href="#/endpoint/{encodeURIComponent(provider.url)}" class="test-link">
                 Test Results
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -640,32 +636,6 @@
     justify-content: space-between;
     padding-top: 0.75rem;
     border-top: 1px solid var(--border);
-  }
-
-  .status-indicator {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: var(--status-inactive);
-  }
-
-  .status-dot.active {
-    background-color: var(--status-nominal);
-    box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  .status-text {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    color: var(--text-muted);
   }
 
   .test-link {
