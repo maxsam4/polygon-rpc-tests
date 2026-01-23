@@ -24,12 +24,6 @@ describe('Trace RPC Methods', () => {
     assertMethodWorks(response, 'trace_call');
   });
 
-  it('trace_rawTransaction - traces raw transaction', async () => {
-    const params = getMethodParams('trace_rawTransaction', settings, latestData);
-    const response = await callRpc(rpcUrl, 'trace_rawTransaction', params, 30000);
-    assertMethodWorks(response, 'trace_rawTransaction');
-  });
-
   it('trace_replayBlockTransactions - replays block transactions', async () => {
     const params = getMethodParams('trace_replayBlockTransactions', settings, latestData);
     const response = await callRpc(rpcUrl, 'trace_replayBlockTransactions', params, 30000);

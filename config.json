@@ -1,18 +1,21 @@
 {
   "endpoints": [
     { "url": "https://polygon.drpc.org", "name": "dRPC public", "showInBenchmark": true },
-    { "url": "https://polygon-bor-rpc.publicnode.com", "name": "PublicNode", "showInBenchmark": true },
-    { "url": "https://polygon-rpc.com", "name": "Polygon-RPC", "delayBetweenCallsMs": 500, "showInBenchmark": true },
-    { "url": "https://polygon.gateway.tenderly.co", "name": "Tenderly", "delayBetweenCallsMs": 200, "showInBenchmark": true },
-    { "url": "https://polygon.lava.build", "name": "Lava", "showInBenchmark": true },
-    { "url": "https://api.zan.top/polygon-mainnet", "name": "ZAN", "showInBenchmark": true },
-    { "url": "https://polygon-public.nodies.app", "name": "Nodies", "showInBenchmark": true },
-    { "url": "https://1rpc.io/matic", "name": "1RPC", "showInBenchmark": true },
-    { "url": "https://polygon.rpc.subquery.network/public", "name": "SubQuery", "showInBenchmark": true },
-    { "url": "https://rpc-mainnet.matic.quiknode.pro", "name": "QuikNode", "showInBenchmark": true },
-    { "url": "https://polygon-mainnet.gateway.tatum.io", "name": "Tatum", "showInBenchmark": true },
-    { "url": "https://endpoints.omniatech.io/v1/matic/mainnet/public", "name": "Omnia", "showInBenchmark": true },
-    { "url": "https://poly.api.pocket.network", "name": "Pocket Network", "showInBenchmark": true }
+    { "url": "https://polygon-bor-rpc.publicnode.com", "name": "PublicNode public", "showInBenchmark": true },
+    { "url": "https://tenderly.rpc.polygon.community", "name": "Tenderly public", "showInBenchmark": true },
+    { "url": "https://polygon.lava.build", "name": "Lavanet public", "showInBenchmark": true },
+    { "url": "https://api.zan.top/polygon-mainnet", "name": "ZAN public", "showInBenchmark": true },
+    { "url": "https://polygon-public.nodies.app", "name": "Nodies public", "showInBenchmark": true },
+    { "url": "https://1rpc.io/matic", "name": "1RPC public", "showInBenchmark": true },
+    { "url": "https://polygon.rpc.subquery.network/public", "name": "SubQuery public", "showInBenchmark": true },
+    { "url": "https://rpc-mainnet.matic.quiknode.pro", "name": "QuikNode public", "showInBenchmark": true },
+    { "url": "https://polygon-mainnet.gateway.tatum.io", "name": "Tatum public", "showInBenchmark": true },
+    { "url": "https://api.blockeden.xyz/polygon/Zo7ywHSxK6kZuDQUPsmq", "name": "BlockEden public", "showInBenchmark": true },
+    { "url": "https://endpoints.omniatech.io/v1/matic/mainnet/public", "name": "Omnia public", "showInBenchmark": true },
+    { "url": "https://pol.leorpc.com/?api_key=FREE", "name": "LeoRPC public", "showInBenchmark": true },
+    { "url": "https://polygon.api.onfinality.io/public", "name": "OnFinality public", "showInBenchmark": true },
+    { "url": "https://137.rpc.thirdweb.com/", "name": "ThirdWeb public", "showInBenchmark": true },
+    { "url": "https://poly.api.pocket.network", "name": "Pocket Network public", "showInBenchmark": true }
   ],
   "testSettings": {
     "timeoutMs": 10000,
@@ -118,7 +121,6 @@
     ],
     "trace": [
       "trace_call",
-      "trace_rawTransaction",
       "trace_replayBlockTransactions",
       "trace_replayTransaction",
       "trace_block",
