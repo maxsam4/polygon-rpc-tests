@@ -46,6 +46,30 @@ export async function callRpc(
     });
 
     return await response.json();
+  } catch (error) {
+    // Handle abort errors (timeout) and other fetch errors
+    if (error instanceof Error) {
+      if (error.name === 'AbortError' || error.message.includes('aborted')) {
+        return {
+          error: {
+            code: -32000,
+            message: `Request timeout after ${timeoutMs}ms`,
+          },
+        };
+      }
+      return {
+        error: {
+          code: -32603,
+          message: error.message,
+        },
+      };
+    }
+    return {
+      error: {
+        code: -32603,
+        message: 'Unknown error',
+      },
+    };
   } finally {
     clearTimeout(timeoutId);
   }

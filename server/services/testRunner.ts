@@ -176,6 +176,16 @@ async function collectLatestData(
       prevBlockHash,
       txHash,
     };
+  } catch (error) {
+    // Handle abort errors and other fetch errors
+    if (error instanceof Error) {
+      if (error.name === 'AbortError' || error.message.includes('aborted')) {
+        throw new Error(`Timeout collecting latest data after ${timeoutMs}ms`);
+      }
+      // Re-throw other errors with original message
+      throw error;
+    }
+    throw new Error('Unknown error collecting latest data');
   } finally {
     clearTimeout(timeoutId);
   }
