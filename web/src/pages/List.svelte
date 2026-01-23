@@ -113,23 +113,31 @@
           chainId: '0x89', // Polygon Mainnet chain ID (137)
           chainName: 'Polygon Mainnet',
           nativeCurrency: {
-            name: 'MATIC',
-            symbol: 'MATIC',
+            name: 'POL',
+            symbol: 'POL',
             decimals: 18
           },
           rpcUrls: [provider.url],
           blockExplorerUrls: ['https://polygonscan.com']
         }]
       });
+      // Successfully added/updated - no alert needed, MetaMask handles the UX
     } catch (error: unknown) {
-      console.error('Wallet error:', error);
       // Check if user rejected the request (error code 4001)
-      if (typeof error === 'object' && error !== null && 'code' in error && (error as { code: number }).code === 4001) {
-        // User rejected, don't show error
-        return;
+      if (typeof error === 'object' && error !== null && 'code' in error) {
+        const errorCode = (error as { code: number }).code;
+        if (errorCode === 4001) {
+          // User rejected, don't show error
+          return;
+        }
+        // Log error with code for debugging
+        console.error('Wallet error:', error);
+        const errorMessage = 'message' in error ? (error as { message: string }).message : 'Unknown error';
+        alert(`Failed to add/update network.\nError code: ${errorCode}\nMessage: ${errorMessage}\n\nPlease check the browser console for more details.`);
+      } else {
+        console.error('Wallet error:', error);
+        alert('Failed to add/update network. Please check the browser console for more details.');
       }
-      // For other errors, show a generic message
-      alert('Failed to add/update network. Please try again or add it manually in your wallet settings.');
     }
   }
 
