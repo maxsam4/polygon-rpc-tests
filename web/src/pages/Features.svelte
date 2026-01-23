@@ -9,6 +9,8 @@
   let filter = '';
   let sortColumn: 'name' | 'total' | 'responseTime' | Category = 'total';
   let sortDirection: 'asc' | 'desc' = 'desc';
+  let isLaunching = false;
+  let launchError = '';
 
   function getCategorySummary(endpoint: EndpointSummary, category: Category) {
     return endpoint.categorySummaries[category];
@@ -80,6 +82,52 @@
   function handleRowClick(endpoint: EndpointSummary) {
     push(`/endpoint/${endpoint.id}`);
   }
+
+  async function launchTestSequence() {
+    if (isLaunching) return;
+
+    isLaunching = true;
+    launchError = '';
+
+    try {
+      const response = await fetch('/api/tests/run-public', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          // Rate limit exceeded
+          launchError = data.message || 'Rate limit exceeded. Please wait before trying again.';
+        } else if (response.status === 409) {
+          // Tests already running
+          launchError = data.error || 'Tests are already running.';
+        } else {
+          launchError = data.error || 'Failed to launch test sequence.';
+        }
+      } else {
+        // Success - show message and start reloading results
+        launchError = '';
+        alert('Test sequence launched! Results will update in ~6 minutes. The page will reload automatically.');
+
+        // Reload results after a delay
+        setTimeout(async () => {
+          try {
+            $results = await fetchResults();
+          } catch (e) {
+            console.error('Failed to reload results:', e);
+          }
+        }, 360000); // 6 minutes
+      }
+    } catch (err) {
+      launchError = 'Network error. Please try again.';
+      console.error('Launch error:', err);
+    } finally {
+      isLaunching = false;
+    }
+  }
 </script>
 
 <div class="results-page">
@@ -129,7 +177,28 @@
         bind:value={filter}
       />
     </div>
+    <button
+      class="launch-btn"
+      on:click={launchTestSequence}
+      disabled={isLaunching}
+    >
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M3 2L11 7L3 12V2Z" fill="currentColor"/>
+      </svg>
+      {isLaunching ? 'Launching...' : 'Launch Test Sequence'}
+    </button>
   </div>
+
+  {#if launchError}
+    <div class="error-banner">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 4.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="8" cy="11" r="0.5" fill="currentColor"/>
+      </svg>
+      <span>{launchError}</span>
+    </div>
+  {/if}
 
   {#if $loading}
     <div class="status-message">
@@ -537,6 +606,58 @@
   .response-time {
     font-family: var(--font-mono);
     color: var(--text-muted);
+  }
+
+  .launch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background-color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 2px;
+    color: var(--bg-primary);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .launch-btn:hover:not(:disabled) {
+    background-color: transparent;
+    color: var(--accent);
+    box-shadow: 0 0 12px rgba(0, 180, 216, 0.3);
+  }
+
+  .launch-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .launch-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .error-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background-color: rgba(255, 77, 77, 0.1);
+    border: 1px solid rgba(255, 77, 77, 0.3);
+    border-radius: 2px;
+    color: var(--status-critical);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
+  .error-banner svg {
+    flex-shrink: 0;
   }
 
   @keyframes fadeInUp {
