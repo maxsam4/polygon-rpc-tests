@@ -99,7 +99,7 @@
 </script>
 
 <div class="endpoint-page">
-  <a href="/#/features" use:link class="back-link">
+  <a href="/features" use:link class="back-link">
     <span class="back-icon">←</span>
     <span>Back to Features</span>
   </a>
