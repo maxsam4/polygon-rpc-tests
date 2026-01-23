@@ -91,11 +91,32 @@
     return extractDomain(website);
   }
 
-  $: filteredProviders = providers.filter(p =>
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (p.providerName && p.providerName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    p.url.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  $: filteredProviders = (() => {
+    // First, filter by search query
+    const filtered = providers.filter(p =>
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.providerName && p.providerName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      p.url.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // Deduplicate by providerName, keeping first occurrence
+    const seen = new Set<string>();
+    const unique = filtered.filter(p => {
+      const displayName = getProviderDisplayName(p);
+      if (seen.has(displayName)) {
+        return false;
+      }
+      seen.add(displayName);
+      return true;
+    });
+
+    // Sort alphabetically by providerName
+    return unique.sort((a, b) => {
+      const nameA = getProviderDisplayName(a).toLowerCase();
+      const nameB = getProviderDisplayName(b).toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  })();
 
   $: providerCount = filteredProviders.length;
 
