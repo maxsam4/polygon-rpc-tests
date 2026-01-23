@@ -1,25 +1,28 @@
 {
   "endpoints": [
-    { "url": "https://polygon.drpc.org", "name": "dRPC public", "showInBenchmark": true },
-    { "url": "https://polygon-bor-rpc.publicnode.com", "name": "PublicNode public", "showInBenchmark": true },
-    { "url": "https://tenderly.rpc.polygon.community", "name": "Tenderly public", "showInBenchmark": true },
-    { "url": "https://polygon.lava.build", "name": "Lavanet public", "showInBenchmark": true },
-    { "url": "https://api.zan.top/polygon-mainnet", "name": "ZAN public", "showInBenchmark": true },
-    { "url": "https://polygon-public.nodies.app", "name": "Nodies public", "showInBenchmark": true },
-    { "url": "https://1rpc.io/matic", "name": "1RPC public", "showInBenchmark": true },
-    { "url": "https://polygon.rpc.subquery.network/public", "name": "SubQuery public", "showInBenchmark": true },
-    { "url": "https://rpc-mainnet.matic.quiknode.pro", "name": "QuikNode public", "showInBenchmark": true },
-    { "url": "https://polygon-mainnet.gateway.tatum.io", "name": "Tatum public", "showInBenchmark": true },
-    { "url": "https://api.blockeden.xyz/polygon/Zo7ywHSxK6kZuDQUPsmq", "name": "BlockEden public", "showInBenchmark": true },
-    { "url": "https://endpoints.omniatech.io/v1/matic/mainnet/public", "name": "Omnia public", "showInBenchmark": true },
-    { "url": "https://pol.leorpc.com/?api_key=FREE", "name": "LeoRPC public", "showInBenchmark": true },
-    { "url": "https://polygon.api.onfinality.io/public", "name": "OnFinality public", "showInBenchmark": true },
-    { "url": "https://137.rpc.thirdweb.com/", "name": "ThirdWeb public", "showInBenchmark": true },
-    { "url": "https://poly.api.pocket.network", "name": "Pocket Network public", "showInBenchmark": true }
+    { "url": "https://polygon.drpc.org", "name": "dRPC public", "homepage": "https://drpc.org", "showInBenchmark": true },
+    { "url": "https://polygon-bor-rpc.publicnode.com", "name": "PublicNode public", "homepage": "https://publicnode.com", "showInBenchmark": true },
+    { "url": "https://tenderly.rpc.polygon.community", "name": "Tenderly public", "homepage": "https://tenderly.co", "showInBenchmark": true },
+    { "url": "https://polygon.lava.build", "name": "Lavanet public", "homepage": "https://lavanet.xyz", "showInBenchmark": true },
+    { "url": "https://api.zan.top/polygon-mainnet", "name": "ZAN public", "homepage": "https://zan.top", "showInBenchmark": true },
+    { "url": "https://polygon-public.nodies.app", "name": "Nodies public", "homepage": "https://nodies.app", "showInBenchmark": true },
+    { "url": "https://1rpc.io/matic", "name": "1RPC public", "homepage": "https://1rpc.io", "showInBenchmark": true },
+    { "url": "https://polygon.rpc.subquery.network/public", "name": "SubQuery public", "homepage": "https://subquery.network", "showInBenchmark": true },
+    { "url": "https://rpc-mainnet.matic.quiknode.pro", "name": "QuikNode public", "homepage": "https://quiknode.io", "showInBenchmark": true },
+    { "url": "https://polygon-mainnet.gateway.tatum.io", "name": "Tatum public", "homepage": "https://tatum.io", "showInBenchmark": true },
+    { "url": "https://api.blockeden.xyz/polygon/Zo7ywHSxK6kZuDQUPsmq", "name": "BlockEden public", "homepage": "https://blockeden.xyz", "showInBenchmark": true },
+    { "url": "https://endpoints.omniatech.io/v1/matic/mainnet/public", "name": "Omnia public", "homepage": "https://omniatech.io", "showInBenchmark": true },
+    { "url": "https://pol.leorpc.com/?api_key=FREE", "name": "LeoRPC public", "homepage": "https://leorpc.com", "showInBenchmark": true },
+    { "url": "https://polygon.api.onfinality.io/public", "name": "OnFinality public", "homepage": "https://onfinality.io", "showInBenchmark": true },
+    { "url": "https://137.rpc.thirdweb.com/", "name": "ThirdWeb public", "homepage": "https://thirdweb.com", "showInBenchmark": true },
+    { "url": "https://poly.api.pocket.network", "name": "Pocket Network public", "homepage": "https://pokt.network", "showInBenchmark": true }
   ],
+  "pageSettings": {
+    "providersPageTitle": "RPC Providers"
+  },
   "testSettings": {
     "timeoutMs": 10000,
-    "delayBetweenCallsMs": 100,
+    "delayBetweenCallsMs": 1000,
     "archiveBlockNumber": 35000000,
     "archiveTestAddress": "0x0000000000000000000000000000000000001010",
     "concurrency": 25

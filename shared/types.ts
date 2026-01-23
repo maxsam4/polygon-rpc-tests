@@ -10,9 +10,11 @@ export interface LatestData {
 export interface Endpoint {
   url: string;
   name: string;
+  homepage?: string;  // Provider's website homepage
   delayBetweenCallsMs?: number;  // Optional per-endpoint override
   sensitive?: boolean;  // If true, URL is hidden in UI and API responses
-  showInBenchmark?: boolean;  // If true, endpoint appears in benchmark page
+  showInBenchmark?: boolean;  // If true, endpoint appears in latency page
+  showInProviders?: boolean;  // If true, endpoint appears in providers page (default: true)
 }
 
 export interface TestSettings {
@@ -37,10 +39,15 @@ export interface MethodCategories {
   batch: string[];
 }
 
+export interface PageSettings {
+  providersPageTitle?: string;  // Custom title for providers page (default: "RPC Providers")
+}
+
 export interface Config {
   endpoints: Endpoint[];
   testSettings: TestSettings;
   methods: MethodCategories;
+  pageSettings?: PageSettings;
 }
 
 export interface TestResult {

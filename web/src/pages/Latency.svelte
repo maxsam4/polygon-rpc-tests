@@ -31,7 +31,9 @@
       if (!res.ok) throw new Error('Failed to fetch endpoints');
 
       const data = await res.json();
-      initializeEndpoints(data.endpoints);
+      // Filter endpoints by showInBenchmark (default to true if not specified)
+      const benchmarkEndpoints = (data.endpoints || []).filter((ep: any) => ep.showInBenchmark !== false);
+      initializeEndpoints(benchmarkEndpoints);
       loading = false;
     } catch (e) {
       error = e instanceof Error ? e.message : 'Failed to load endpoints';

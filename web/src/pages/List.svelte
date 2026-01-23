@@ -3,6 +3,7 @@
   import type { Endpoint } from '../../../shared/types';
 
   let providers: Endpoint[] = [];
+  let pageTitle = 'RPC Providers';
   let loading = true;
   let error: string | null = null;
   let searchQuery = '';
@@ -14,7 +15,14 @@
       if (!res.ok) throw new Error('Failed to fetch providers');
 
       const data = await res.json();
-      providers = data.endpoints || [];
+      // Filter by showInProviders (default to true if not specified)
+      providers = (data.endpoints || []).filter((p: Endpoint) => p.showInProviders !== false);
+
+      // Load page title if available
+      if (data.pageSettings?.providersPageTitle) {
+        pageTitle = data.pageSettings.providersPageTitle;
+      }
+
       loading = false;
     } catch (e) {
       error = e instanceof Error ? e.message : 'Failed to load providers';
@@ -29,6 +37,15 @@
     } catch {
       return url;
     }
+  }
+
+  function getProviderWebsite(provider: Endpoint): string {
+    // Use homepage if configured, otherwise extract from RPC URL
+    if (provider.homepage) {
+      return provider.homepage;
+    }
+    // Fallback to extracting domain from RPC URL
+    return `https://${extractDomain(provider.url)}`;
   }
 
   function getProviderInitials(name: string): string {
@@ -64,10 +81,15 @@
     }
   }
 
-  function navigateToWebsite(url: string, e: MouseEvent) {
+  function navigateToWebsite(provider: Endpoint, e: MouseEvent) {
     e.preventDefault();
-    const domain = extractDomain(url);
-    window.open(`https://${domain}`, '_blank', 'noopener,noreferrer');
+    const website = getProviderWebsite(provider);
+    window.open(website, '_blank', 'noopener,noreferrer');
+  }
+
+  function getWebsiteDomain(provider: Endpoint): string {
+    const website = getProviderWebsite(provider);
+    return extractDomain(website);
   }
 
   $: filteredProviders = providers.filter(p =>
@@ -85,7 +107,7 @@
 <div class="list-page">
   <div class="page-header">
     <div class="header-content">
-      <h2 class="section-title">RPC Providers</h2>
+      <h2 class="section-title">{pageTitle}</h2>
       {#if !loading}
         <div class="provider-count" class:pulse={providerCount > 0}>
           <span class="count-number">{providerCount}</span>
@@ -138,15 +160,15 @@
                 <h3 class="provider-name">{provider.name}</h3>
                 <button
                   class="website-link"
-                  on:click={(e) => navigateToWebsite(provider.url, e)}
-                  aria-label="Visit {extractDomain(provider.url)}"
+                  on:click={(e) => navigateToWebsite(provider, e)}
+                  aria-label="Visit {getWebsiteDomain(provider)}"
                 >
                   <svg class="link-icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path d="M10 6.5V10C10 10.55 9.55 11 9 11H2C1.45 11 1 10.55 1 10V3C1 2.45 1.45 2 2 2H5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                     <path d="M7 1H11V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M11 1L6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                   </svg>
-                  {extractDomain(provider.url)}
+                  {getWebsiteDomain(provider)}
                 </button>
               </div>
             </div>

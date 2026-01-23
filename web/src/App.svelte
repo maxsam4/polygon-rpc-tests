@@ -1,17 +1,17 @@
 <script lang="ts">
   import Router from 'svelte-spa-router';
   import List from './pages/List.svelte';
-  import Results from './pages/Results.svelte';
+  import Features from './pages/Features.svelte';
   import Endpoint from './pages/Endpoint.svelte';
   import Admin from './pages/Admin.svelte';
-  import Benchmark from './pages/Benchmark.svelte';
+  import Latency from './pages/Latency.svelte';
 
   const routes = {
     '/': List,
-    '/results': Results,
+    '/features': Features,
     '/endpoint/:id': Endpoint,
     '/admin': Admin,
-    '/benchmark': Benchmark,
+    '/latency': Latency,
   };
 
   // Get current route for active state
@@ -44,13 +44,13 @@
           <span class="nav-indicator"></span>
           <span class="nav-label">Providers</span>
         </a>
-        <a href="#/results" class="nav-btn" class:active={currentPath === '/results'}>
+        <a href="#/features" class="nav-btn" class:active={currentPath === '/features'}>
           <span class="nav-indicator"></span>
-          <span class="nav-label">Results</span>
+          <span class="nav-label">Features</span>
         </a>
-        <a href="#/benchmark" class="nav-btn" class:active={currentPath === '/benchmark'}>
+        <a href="#/latency" class="nav-btn" class:active={currentPath === '/latency'}>
           <span class="nav-indicator"></span>
-          <span class="nav-label">Benchmark</span>
+          <span class="nav-label">Latency</span>
         </a>
         <a href="#/admin" class="nav-btn" class:active={currentPath === '/admin'}>
           <span class="nav-indicator"></span>
