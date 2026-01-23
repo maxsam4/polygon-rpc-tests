@@ -9,7 +9,7 @@ import type {
 // Default state
 const defaultState: BenchmarkState = {
   endpoints: {},
-  pollingIntervalMs: 1000,
+  pollingIntervalMs: 2000,
   maxDataPoints: 60,
   isRunning: false,
 };
