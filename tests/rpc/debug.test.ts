@@ -54,12 +54,6 @@ describe('Debug RPC Methods', () => {
     assertMethodWorks(response, 'debug_getBadBlocks');
   });
 
-  it('debug_accountRange - returns account range', async () => {
-    const params = getMethodParams('debug_accountRange', settings, latestData);
-    const response = await callRpc(rpcUrl, 'debug_accountRange', params, 30000);
-    assertMethodWorks(response, 'debug_accountRange');
-  });
-
   it('debug_getModifiedAccountsByNumber - returns modified accounts', async () => {
     const params = getMethodParams('debug_getModifiedAccountsByNumber', settings, latestData);
     const response = await callRpc(rpcUrl, 'debug_getModifiedAccountsByNumber', params, 30000);

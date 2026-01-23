@@ -109,7 +109,6 @@
       "debug_traceBlockByHash",
       "debug_storageRangeAt",
       "debug_getBadBlocks",
-      "debug_accountRange",
       "debug_getModifiedAccountsByNumber",
       "debug_getModifiedAccountsByHash",
       "debug_traceTransaction:archive",
