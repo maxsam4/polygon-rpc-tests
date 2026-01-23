@@ -116,7 +116,7 @@
       </p>
       <p class="disclaimer-item">
         <span class="bullet">›</span>
-        <span class="text">Tests execute one request per second per endpoint. Some failures may indicate rate limiting rather than missing functionality.</span>
+        <span class="text">Tests execute upto one request per second per endpoint. Some failures may indicate rate limiting rather than missing functionality.</span>
       </p>
     </div>
   </div>
