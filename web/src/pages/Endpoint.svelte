@@ -53,9 +53,8 @@
   }
 
   $: if ($results && params.id) {
-    // Decode the URL-encoded params.id to match the keys in results.endpoints
-    const decodedId = decodeURIComponent(params.id);
-    endpoint = $results.endpoints[decodedId] || null;
+    // params.id is the slugified endpoint name (e.g., "drpc-public")
+    endpoint = $results.endpoints[params.id] || null;
   }
 
   $: methodEntries = endpoint

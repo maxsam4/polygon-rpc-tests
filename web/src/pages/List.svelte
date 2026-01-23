@@ -2,6 +2,16 @@
   import { onMount } from 'svelte';
   import type { Endpoint } from '../../../shared/types';
 
+  // Extend window with ethereum for wallet integration
+  declare global {
+    interface Window {
+      ethereum?: {
+        request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+        isMetaMask?: boolean;
+      };
+    }
+  }
+
   let providers: Endpoint[] = [];
   let loading = true;
   let error: string | null = null;
@@ -47,6 +57,13 @@
     return provider.providerName || provider.name;
   }
 
+  function slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  }
+
   function getProviderInitials(name: string): string {
     const words = name.split(' ').filter(w => w.length > 0);
     if (words.length === 1) {
@@ -77,6 +94,38 @@
       }, 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
+    }
+  }
+
+  async function addToWallet(provider: Endpoint) {
+    if (!window.ethereum) {
+      alert('No wallet detected. Please install MetaMask or another Web3 wallet.');
+      return;
+    }
+
+    try {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: '0x89', // Polygon Mainnet chain ID (137)
+          chainName: `Polygon Mainnet (${getProviderDisplayName(provider)})`,
+          nativeCurrency: {
+            name: 'MATIC',
+            symbol: 'MATIC',
+            decimals: 18
+          },
+          rpcUrls: [provider.url],
+          blockExplorerUrls: ['https://polygonscan.com']
+        }]
+      });
+    } catch (err: unknown) {
+      console.error('Failed to add network:', err);
+      // Check if user rejected the request (error code 4001)
+      if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: number }).code === 4001) {
+        // User rejected the request
+        return;
+      }
+      alert('Failed to add network to wallet. Please try again.');
     }
   }
 
@@ -230,7 +279,32 @@
             </div>
 
             <div class="card-footer">
-              <a href="#/endpoint/{encodeURIComponent(provider.url)}" class="test-link">
+              {#if provider.sensitive}
+                <a
+                  href={getProviderWebsite(provider)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="action-btn primary"
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 1V7M7 7V13M7 7H13M7 7H1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  Sign Up
+                </a>
+              {:else}
+                <button
+                  class="action-btn primary"
+                  on:click={() => addToWallet(provider)}
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <rect x="2" y="3" width="10" height="9" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M4 3V2.5C4 1.67157 4.67157 1 5.5 1H8.5C9.32843 1 10 1.67157 10 2.5V3" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="7" cy="8" r="1" fill="currentColor"/>
+                  </svg>
+                  Add to Wallet
+                </button>
+              {/if}
+              <a href="#/endpoint/{slugify(provider.name)}" class="action-btn secondary">
                 Test Results
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                   <path d="M2 6H10M10 6L6 2M10 6L6 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -633,36 +707,54 @@
   .card-footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 0.5rem;
     padding-top: 0.75rem;
     border-top: 1px solid var(--border);
   }
 
-  .test-link {
+  .action-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    padding: 0.375rem 0.75rem;
-    background-color: transparent;
-    border: 1px solid var(--border);
+    padding: 0.5rem 0.875rem;
     border-radius: 2px;
-    color: var(--text-secondary);
     font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 500;
     text-decoration: none;
+    cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
   }
 
-  .test-link:hover {
+  .action-btn.primary {
+    background-color: var(--accent);
+    border: 1px solid var(--accent);
+    color: var(--bg-primary);
+  }
+
+  .action-btn.primary:hover {
+    background-color: transparent;
+    color: var(--accent);
+    box-shadow: 0 0 12px rgba(0, 180, 216, 0.3);
+  }
+
+  .action-btn.secondary {
+    background-color: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  .action-btn.secondary:hover {
     border-color: var(--accent);
     color: var(--accent);
     background-color: rgba(0, 180, 216, 0.05);
   }
 
-  .test-link svg {
-    width: 12px;
-    height: 12px;
+  .action-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
   }
 
   @keyframes fadeInUp {
